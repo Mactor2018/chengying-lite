@@ -4,173 +4,375 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Home - Brand</title>
+    <title>CareBridge Nursing Home Communication Platform</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="assets/css/./embed/animation/aos.min.css">
-    <link rel="stylesheet" href="assets/css/baguetteBox.min.css">
+    <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="57">
-    <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
-        <div class="container"><a class="navbar-brand" href="#page-top">Brand</a><button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-align-justify"></i></button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#portfolio">Portfolio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <header class="text-center text-white d-flex masthead" style="background-image:url('assets/img/header.jpg');">
-        <div class="container my-auto">
-            <div class="row">
-                <div class="col-lg-10 mx-auto">
-                    <h1 class="text-uppercase"><strong>Your Favorite Source of Free Bootstrap Themes</strong></h1>
-                    <hr>
-                </div>
-            </div>
-            <div class="col-lg-8 mx-auto">
-                <p class="mb-5 text-faded">We can help you build better websites using the Bootstrap CSS framework! Just download your template and start going, no strings attached!</p><a class="btn btn-primary btn-xl" role="button" href="#services">Find Out More</a>
-            </div>
-        </div>
-    </header>
-    <section id="about" class="bg-primary">
-        <div class="container">
-            <div class="row">
-                <div class="col offset-lg-8 text-center mx-auto">
-                    <h2 class="text-white section-heading">We've got what you need!</h2>
-                    <hr class="my-4 light">
-                    <p class="mb-4 text-faded">Bootstrap has everything you need to get your new website up and running in no time! All of the templates and themes are open source, free to download, and easy to use. No strings attached!</p><a class="btn btn-light btn-xl" role="button" href="#services">Get Started!</a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section id="services">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h2 class="section-heading">At Your Service</h2>
-                    <hr class="my-4">
-                </div>
-            </div>
-        </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 col-lg-3 text-center">
-                    <div class="mt-5 mx-auto service-box"><i class="fa fa-diamond mb-3 fa-4x text-primary" data-aos="zoom-in" data-aos-duration="200" data-aos-once="true"></i>
-                        <h3 class="mb-3">Sturdy Templates</h3>
-                        <p class="text-muted mb-0">Our templates are updated regularly so they don't break.</p>
+<body>
+    <div class="app-shell">
+        <aside class="side-nav" aria-label="Primary navigation">
+            <div class="profile-strip">
+                <div class="workspace-brand">
+                    <button class="avatar avatar-station" type="button" aria-label="CareBridge workspace">CB</button>
+                    <div class="brand-copy">
+                        <strong>CareBridge</strong>
+                        <span>MVP Demo</span>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 text-center">
-                    <div class="mt-5 mx-auto service-box"><i class="fa fa-paper-plane mb-3 fa-4x text-primary" data-aos="zoom-in" data-aos-duration="200" data-aos-delay="200" data-aos-once="true"></i>
-                        <h3 class="mb-3">Ready to Ship</h3>
-                        <p class="text-muted mb-0">You can use this theme as is, or you can make changes!</p>
+                <button class="icon-button" type="button" data-action="new-resident" aria-label="Add resident">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <label class="search-pill" for="commandSearch">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <input id="commandSearch" type="search" placeholder="Search (Cmd+K)" autocomplete="off">
+            </label>
+
+            <nav class="nav flex-column app-nav">
+                <button class="nav-link active" type="button" data-view="dashboard">
+                    <i class="fa fa-th-large" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                    <span class="nav-badge" id="dashboardBadge"></span>
+                </button>
+                <button class="nav-link" type="button" data-view="residents">
+                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                    <span>Residents</span>
+                </button>
+                <button class="nav-link" type="button" data-view="conversations">
+                    <i class="fa fa-comments" aria-hidden="true"></i>
+                    <span>Conversations</span>
+                    <span class="nav-badge danger" id="conversationBadge"></span>
+                </button>
+                <button class="nav-link" type="button" data-view="schedule">
+                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                    <span>Schedule</span>
+                </button>
+                <button class="nav-link" type="button" data-view="care">
+                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                    <span>Care Records</span>
+                </button>
+                <button class="nav-link" type="button" data-view="reports">
+                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                    <span>Daily Reports</span>
+                </button>
+                <button class="nav-link" type="button" data-view="users">
+                    <i class="fa fa-users" aria-hidden="true"></i>
+                    <span>User Management</span>
+                </button>
+                <button class="nav-link" type="button" data-view="settings">
+                    <i class="fa fa-shield" aria-hidden="true"></i>
+                    <span>Security</span>
+                </button>
+            </nav>
+
+        </aside>
+
+        <main class="main-stage">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
+                    <h1 id="viewTitle">Dashboard</h1>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-light icon-only" type="button" data-action="show-audit" aria-label="Audit log">
+                        <i class="fa fa-bell-o" aria-hidden="true"></i>
+                    </button>
+                    <span class="date-chip">Jun 8, 2026</span>
+                    <div class="avatar avatar-small avatar-staff" aria-label="Signed in staff member">GT</div>
+                </div>
+            </header>
+
+            <div class="content-grid">
+                <section class="list-pane" id="listPane" aria-live="polite"></section>
+                <section class="detail-pane" id="detailPane" aria-live="polite"></section>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="residentModal" tabindex="-1" aria-labelledby="residentModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <form class="modal-content" id="residentForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Personnel & Profile</p>
+                        <h2 class="modal-title fs-5" id="residentModalTitle">Add Resident</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="residentIdField" type="hidden">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="residentNameField">Resident name</label>
+                            <input class="form-control" id="residentNameField" type="text" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentAgeField">Age</label>
+                            <input class="form-control" id="residentAgeField" type="number" min="60" max="120" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentGenderField">Gender</label>
+                            <select class="form-select" id="residentGenderField" required>
+                                <option>Female</option>
+                                <option>Male</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentRoomField">Room</label>
+                            <input class="form-control" id="residentRoomField" type="text" placeholder="A-308" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentBedField">Bed</label>
+                            <input class="form-control" id="residentBedField" type="text" placeholder="Bed 2" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentFloorField">Floor</label>
+                            <select class="form-select" id="residentFloorField" required>
+                                <option>Floor A</option>
+                                <option>Floor B</option>
+                                <option>Floor C</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="residentCareLevelField">Care level</label>
+                            <select class="form-select" id="residentCareLevelField" required>
+                                <option>Level I Assisted</option>
+                                <option>Level II Assisted</option>
+                                <option>Level III Intensive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="residentFamilyField">Primary family contact</label>
+                            <input class="form-control" id="residentFamilyField" type="text" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="residentCaregiverField">Main caregiver</label>
+                            <input class="form-control" id="residentCaregiverField" type="text" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="residentTagsField">Health tags</label>
+                            <input class="form-control" id="residentTagsField" type="text" placeholder="Hypertension, Mobility Risk">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 text-center">
-                    <div class="mt-5 mx-auto service-box"><i class="fa fa-newspaper-o mb-3 fa-4x text-primary" data-aos="zoom-in" data-aos-duration="200" data-aos-delay="400" data-aos-once="true"></i>
-                        <h3 class="mb-3">Up to Date</h3>
-                        <p class="text-muted mb-0">We update dependencies to keep things fresh.</p>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save Resident</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="userForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">User & Permission</p>
+                        <h2 class="modal-title fs-5" id="userModalTitle">Add User</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="userIdField" type="hidden">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="userNameField">Name</label>
+                            <input class="form-control" id="userNameField" type="text" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="userPhoneField">Phone</label>
+                            <input class="form-control" id="userPhoneField" type="tel" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="userRoleField">Role</label>
+                            <select class="form-select" id="userRoleField" required>
+                                <option>Admin</option>
+                                <option>Nursing Supervisor</option>
+                                <option>Caregiver</option>
+                                <option>Nurse</option>
+                                <option>Activity Staff</option>
+                                <option>Family Member</option>
+                                <option>Elderly Resident</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="userDepartmentField">Department</label>
+                            <input class="form-control" id="userDepartmentField" type="text" placeholder="Care Team">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 text-center">
-                    <div class="mt-5 mx-auto service-box"><i class="fa fa-heart mb-3 fa-4x text-primary" data-aos="fade" data-aos-duration="200" data-aos-delay="600" data-aos-once="true"></i>
-                        <h3 class="mb-3">Made with Love</h3>
-                        <p class="text-muted mb-0">You have to make your websites with love these days!</p>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <form class="modal-content" id="scheduleForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Schedule & Appointment</p>
+                        <h2 class="modal-title fs-5" id="scheduleModalTitle">Create Schedule</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="scheduleResidentField">Resident</label>
+                            <select class="form-select" id="scheduleResidentField" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="scheduleTypeField">Schedule type</label>
+                            <select class="form-select" id="scheduleTypeField" required>
+                                <option>Daily care task</option>
+                                <option>Medical schedule</option>
+                                <option>Activity schedule</option>
+                                <option>Family visit appointment</option>
+                                <option>Video call appointment</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label" for="scheduleTitleField">Title</label>
+                            <input class="form-control" id="scheduleTitleField" type="text" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="scheduleLocationField">Location</label>
+                            <input class="form-control" id="scheduleLocationField" type="text" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="scheduleStartField">Start time</label>
+                            <input class="form-control" id="scheduleStartField" type="datetime-local" value="2026-06-08T09:00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="scheduleEndField">End time</label>
+                            <input class="form-control" id="scheduleEndField" type="datetime-local" value="2026-06-08T09:30" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="scheduleStaffField">Responsible staff</label>
+                            <input class="form-control" id="scheduleStaffField" type="text" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="scheduleVisibilityField">Visibility</label>
+                            <select class="form-select" id="scheduleVisibilityField" required>
+                                <option>family_visible</option>
+                                <option>staff_only</option>
+                                <option>elderly_visible</option>
+                                <option>all_visible</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="scheduleRepeatField">Repeat</label>
+                            <select class="form-select" id="scheduleRepeatField">
+                                <option>One-time</option>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <section class="p-0" id="portfolio">
-        <div class="container-fluid p-0">
-            <div class="row g-0 popup-gallery">
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/1.jpg"><img class="img-fluid" src="assets/img/thumbnails/1.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/2.jpg"><img class="img-fluid" src="assets/img/thumbnails/2.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/3.jpg"><img class="img-fluid" src="assets/img/thumbnails/3.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/4.jpg"><img class="img-fluid" src="assets/img/thumbnails/4.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/5.jpg"><img class="img-fluid" src="assets/img/thumbnails/5.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-                <div class="col-sm-6 col-lg-4"><a class="portfolio-box" href="assets/img/fullsize/6.jpg"><img class="img-fluid" src="assets/img/thumbnails/6.jpg">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded"><span>Category</span></div>
-                                <div class="project-name"><span>Project Name</span></div>
-                            </div>
-                        </div>
-                    </a></div>
-            </div>
-        </div>
-    </section>
-    <section class="text-white bg-dark">
-        <div class="container text-center">
-            <h2 class="mb-4">Lorem Ipsum!</h2><a class="btn btn-light btn-xl" role="button" data-aos="zoom-in" data-aos-duration="400" data-aos-once="true" href="#">Download Now!</a>
-        </div>
-    </section>
-    <section id="contact">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 text-center mx-auto">
-                    <h2 class="section-heading">Let's Get In Touch!</h2>
-                    <hr class="my-4">
-                    <p class="mb-5">Ready to start your next project with us? That's great! Give us a call or send us an email and we will get back to you as soon as possible!</p>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Create Schedule</button>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 text-center ms-auto"><i class="fa fa-phone mb-3 fa-3x" data-aos="zoom-in" data-aos-duration="300" data-aos-once="true"></i>
-                    <p>123-456-6789</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="appointmentForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Family Appointment</p>
+                        <h2 class="modal-title fs-5" id="appointmentModalTitle">Book Visit or Video Call</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="col-lg-4 text-center me-auto"><i class="fa fa-envelope-o mb-3 fa-3x" data-aos="zoom-in" data-aos-duration="300" data-aos-delay="300" data-aos-once="true"></i>
-                    <p><a href="mailto:your-email@your-domain.com">email@example.com</a></p>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="appointmentResidentField">Resident</label>
+                            <select class="form-select" id="appointmentResidentField" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="appointmentTypeField">Appointment type</label>
+                            <select class="form-select" id="appointmentTypeField" required>
+                                <option>Visit</option>
+                                <option>Video call</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="appointmentTimeField">Time slot</label>
+                            <input class="form-control" id="appointmentTimeField" type="datetime-local" value="2026-06-08T15:00" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="appointmentPurposeField">Purpose or note</label>
+                            <textarea class="form-control" id="appointmentPurposeField" rows="3" required></textarea>
+                        </div>
+                    </div>
                 </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="inquiryForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Service Inquiry</p>
+                        <h2 class="modal-title fs-5" id="inquiryModalTitle">Create Inquiry</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" for="inquiryResidentField">Resident</label>
+                            <select class="form-select" id="inquiryResidentField" required></select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="inquiryTitleField">Inquiry title</label>
+                            <input class="form-control" id="inquiryTitleField" type="text" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="inquiryDescriptionField">Question description</label>
+                            <textarea class="form-control" id="inquiryDescriptionField" rows="4" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Create Inquiry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div class="toast align-items-center border-0" id="appToast" role="status" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toastBody">Saved.</div>
+                <button class="btn-close me-2 m-auto" type="button" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
-    </section>
+    </div>
+
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/./embed/animation/aos.min.js"></script>
-    <script src="assets/js/bs-init.js"></script>
-    <script src="assets/js/baguetteBox.min.js"></script>
-    <script src="assets/js/creative.js"></script>
+    <script src="assets/js/carebridge.js"></script>
 </body>
 
 </html>
