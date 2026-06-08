@@ -32,54 +32,101 @@
             </label>
 
             <nav class="nav flex-column app-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Workspace</div>
+                    <a class="nav-link" href="index.html" data-page-link="dashboard">
+                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                        <span class="nav-badge" id="dashboardBadge"></span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Personnel</div>
+                    <a class="nav-link" href="residents.html" data-page-link="residents">
+                        <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                        <span>Residents</span>
 
-                <a class="nav-link" href="index.html" data-page-link="dashboard">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Dashboard</span>
-                    <span class="nav-badge" id="dashboardBadge"></span>
-                </a>
-                <a class="nav-link" href="residents.html" data-page-link="residents">
-                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                    <span>Residents</span>
+                    </a>
+                    <a class="nav-link" href="users.html" data-page-link="users">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <span>User Management</span>
 
-                </a>
-                <a class="nav-link active" href="conversations.html" data-page-link="conversations">
-                    <i class="fa fa-comments" aria-hidden="true"></i>
-                    <span>Conversations</span>
-                    <span class="nav-badge danger" id="conversationBadge"></span>
-                </a>
-                <a class="nav-link" href="schedule.html" data-page-link="schedule">
-                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                    <span>Schedule</span>
+                    </a>
+                    <a class="nav-link" href="personnel-analytics.html" data-page-link="personnelAnalytics">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span>Personnel Analytics</span>
 
-                </a>
-                <a class="nav-link" href="care-records.html" data-page-link="care">
-                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
-                    <span>Care Records</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Conversation</div>
+                    <a class="nav-link active" href="conversations.html" data-page-link="conversations">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                        <span>Conversations</span>
+                        <span class="nav-badge danger" id="conversationBadge"></span>
+                    </a>
+                    <a class="nav-link" href="service-inquiries.html" data-page-link="serviceInquiries">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        <span>Service Inquiries</span>
 
-                </a>
-                <a class="nav-link" href="reports.html" data-page-link="reports">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <span>Daily Reports</span>
+                    </a>
+                    <a class="nav-link" href="conversation-detail.html" data-page-link="conversationDetail">
+                        <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                        <span>Conversation Detail</span>
 
-                </a>
-                <a class="nav-link" href="users.html" data-page-link="users">
-                    <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>User Management</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Schedule</div>
+                    <a class="nav-link" href="schedule.html" data-page-link="schedule">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                        <span>Schedule Board</span>
 
-                </a>
-                <a class="nav-link" href="security.html" data-page-link="settings">
-                    <i class="fa fa-shield" aria-hidden="true"></i>
-                    <span>Security</span>
+                    </a>
+                    <a class="nav-link" href="appointment-requests.html" data-page-link="appointmentRequests">
+                        <i class="fa fa-video-camera" aria-hidden="true"></i>
+                        <span>Appointments</span>
 
-                </a>
+                    </a>
+                    <a class="nav-link" href="schedule-analytics.html" data-page-link="scheduleAnalytics">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <span>Schedule Analytics</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Care Records</div>
+                    <a class="nav-link" href="care-records.html" data-page-link="care">
+                        <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                        <span>Care Records</span>
+
+                    </a>
+                    <a class="nav-link" href="health-observations.html" data-page-link="healthObservations">
+                        <i class="fa fa-stethoscope" aria-hidden="true"></i>
+                        <span>Health Observations</span>
+
+                    </a>
+                    <a class="nav-link" href="reports.html" data-page-link="reports">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <span>Daily Reports</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Security</div>
+                    <a class="nav-link" href="security.html" data-page-link="settings">
+                        <i class="fa fa-shield" aria-hidden="true"></i>
+                        <span>Security</span>
+
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Structured service inquiry and chat</p>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Conversation inbox and unread triage</p>
                     <h1 id="viewTitle">Conversations</h1>
                 </div>
                 <div class="topbar-actions">
@@ -93,19 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Static conversation page</p>
-                        <h2>Conversation Home</h2>
-                    </div>
-                    <div class="toolbar-line"><label class="visually-hidden" for="conversationSearchStatic">Search conversations</label><input class="form-control" id="conversationSearchStatic" type="search" placeholder="Search resident, title, message"><button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus" aria-hidden="true"></i></button></div>
-                    <div class="entity-list" id="conversationStaticList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Conversation records</div><div class="entity-subtitle">Searchable messages hydrate here</div></div></div></div>
+                    <div class="pane-header"><p class="eyebrow mb-1">Conversation module page 1</p><h2>Conversation Inbox</h2></div><label class="form-label" for="conversationSearch">Search conversations</label><div class="toolbar-line"><input class="form-control" id="conversationSearch" type="search" placeholder="Search resident, title, message"><button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus"></i></button></div><div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Conversation rows</div><div class="entity-subtitle">Hydrated from demo data</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Messages, owner, status, and resident context</p>
-                        <h2>Service Inquiry Detail</h2>
-                    </div>
-                    <div class="chat-layout"><div class="chat-panel"><div class="chat-header"><div class="section-title mb-0"><div><p class="eyebrow mb-1">Service inquiry</p><h2>Conversation detail</h2></div><span class="badge badge-soft">Status</span></div></div><div class="messages"><div class="message-row"><div class="bubble"><strong>Message list</strong><div>Hydrated from demo records</div></div></div></div><form class="message-composer" id="messageFormStatic"><input class="form-control" type="text" placeholder="Type a resident-centered reply"><button class="btn btn-primary" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></form></div><aside class="quick-profile"><div class="app-card"><h3>Resident quick profile</h3><p class="muted-copy mb-0">Care level, caregiver, family contact</p></div><div class="chart-card"><h3>Inquiry status</h3><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div><div class="chart-card"><h3>Conversations by resident</h3><canvas class="chart-canvas" id="chartConversationResidents" height="220"></canvas></div></aside></div>
+                    <div class="section-title"><h2>Conversation Triage</h2><a class="btn btn-light" href="conversation-detail.html">Open Detail</a></div><div class="metric-grid"><div class="stat-tile"><span>Conversations</span><strong>--</strong><span>All threads</span></div><div class="stat-tile"><span>Unread</span><strong>--</strong><span>Needs review</span></div></div><div class="analytics-grid"><div class="chart-card"><h3>Inquiry status</h3><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div><div class="chart-card"><h3>Conversations by resident</h3><canvas class="chart-canvas" id="chartConversationResidents" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

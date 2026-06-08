@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - User Management</title>
+    <title>CareBridge - Service Inquiries</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="users">
+<body data-page="serviceInquiries">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -47,7 +47,7 @@
                         <span>Residents</span>
 
                     </a>
-                    <a class="nav-link active" href="users.html" data-page-link="users">
+                    <a class="nav-link" href="users.html" data-page-link="users">
                         <i class="fa fa-users" aria-hidden="true"></i>
                         <span>User Management</span>
 
@@ -65,7 +65,7 @@
                         <span>Conversations</span>
                         <span class="nav-badge danger" id="conversationBadge"></span>
                     </a>
-                    <a class="nav-link" href="service-inquiries.html" data-page-link="serviceInquiries">
+                    <a class="nav-link active" href="service-inquiries.html" data-page-link="serviceInquiries">
                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                         <span>Service Inquiries</span>
 
@@ -126,8 +126,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">RBAC users and account status</p>
-                    <h1 id="viewTitle">User Management</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Inquiry workflow and status board</p>
+                    <h1 id="viewTitle">Service Inquiries</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -140,10 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header"><p class="eyebrow mb-1">Personnel module page 2</p><h2>User Filters</h2></div><label class="form-label" for="userSearch">Search accounts</label><div class="toolbar-line"><input class="form-control" id="userSearch" type="search" placeholder="Search user or phone"><button class="btn btn-primary icon-only" type="button" data-action="new-user" aria-label="Add user"><i class="fa fa-plus"></i></button></div><label class="form-label" for="userRoleFilter">Role</label><select class="form-select" id="userRoleFilter"><option>All roles</option></select>
+                    <div class="pane-header"><p class="eyebrow mb-1">Conversation module page 2</p><h2>Service Inquiry Board</h2></div><label class="form-label" for="inquirySearch">Search inquiries</label><div class="toolbar-line"><input class="form-control" id="inquirySearch" type="search" placeholder="Search resident, title, status"><button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus"></i></button></div><div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Inquiry rows</div><div class="entity-subtitle">Hydrated from demo records</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="section-title"><h2>RBAC Account Records</h2><button class="btn btn-primary" type="button" data-action="new-user">Add User</button></div><div class="table-wrap"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td>Hydrated account</td><td>Role</td><td>Status</td><td>Edit / Delete</td></tr></tbody></table></div><div class="analytics-grid mt-4"><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div><div class="chart-card"><h3>Account status</h3><canvas class="chart-canvas" id="chartAccountStatus" height="220"></canvas></div></div>
+                    <div class="section-title"><h2>Inquiry Records</h2><button class="btn btn-primary" type="button" data-action="new-inquiry">Create Inquiry</button></div><div class="table-wrap"><table class="table align-middle"><thead><tr><th>Inquiry</th><th>Resident</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td>Hydrated inquiry</td><td>Resident</td><td>Status</td><td>Update / Delete</td></tr></tbody></table></div><div class="analytics-grid mt-4"><div class="chart-card"><h3>Inquiry status</h3><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

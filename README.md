@@ -13,6 +13,15 @@ The demo implements the four core modules from the technical design report:
 
 This is a front-end prototype. It uses real `.html` pages and in-browser demo data so interactions such as adding records, approving appointments, sending messages, and changing inquiry status can be tested without a backend.
 
+Each core module now has at least three independent static Bootstrap pages. `index.html` and `security.html` are supporting pages and are not counted toward the four core module page totals.
+
+| Core module | Independent pages |
+| --- | --- |
+| Personnel & Resident Management | `residents.html`, `users.html`, `personnel-analytics.html` |
+| Conversations & Service Inquiries | `conversations.html`, `service-inquiries.html`, `conversation-detail.html` |
+| Schedule & Appointment Management | `schedule.html`, `appointment-requests.html`, `schedule-analytics.html` |
+| Care Records & Health Observation | `care-records.html`, `health-observations.html`, `reports.html` |
+
 ## Course Operation Coverage
 
 Each functional module is structured around the five required database operations, even though the current demo stores records in `localStorage` until the Flask/MySQL phase.
@@ -51,9 +60,15 @@ Main static pages:
 index.html
 residents.html
 users.html
+personnel-analytics.html
 conversations.html
+service-inquiries.html
+conversation-detail.html
 schedule.html
+appointment-requests.html
+schedule-analytics.html
 care-records.html
+health-observations.html
 reports.html
 security.html
 ```
@@ -64,9 +79,15 @@ security.html
 index.html
 residents.html
 users.html
+personnel-analytics.html
 conversations.html
+service-inquiries.html
+conversation-detail.html
 schedule.html
+appointment-requests.html
+schedule-analytics.html
 care-records.html
+health-observations.html
 reports.html
 security.html
 assets/css/carebridge.css

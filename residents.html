@@ -32,47 +32,94 @@
             </label>
 
             <nav class="nav flex-column app-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Workspace</div>
+                    <a class="nav-link" href="index.html" data-page-link="dashboard">
+                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                        <span class="nav-badge" id="dashboardBadge"></span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Personnel</div>
+                    <a class="nav-link active" href="residents.html" data-page-link="residents">
+                        <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                        <span>Residents</span>
 
-                <a class="nav-link" href="index.html" data-page-link="dashboard">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Dashboard</span>
-                    <span class="nav-badge" id="dashboardBadge"></span>
-                </a>
-                <a class="nav-link active" href="residents.html" data-page-link="residents">
-                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                    <span>Residents</span>
+                    </a>
+                    <a class="nav-link" href="users.html" data-page-link="users">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <span>User Management</span>
 
-                </a>
-                <a class="nav-link" href="conversations.html" data-page-link="conversations">
-                    <i class="fa fa-comments" aria-hidden="true"></i>
-                    <span>Conversations</span>
-                    <span class="nav-badge danger" id="conversationBadge"></span>
-                </a>
-                <a class="nav-link" href="schedule.html" data-page-link="schedule">
-                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                    <span>Schedule</span>
+                    </a>
+                    <a class="nav-link" href="personnel-analytics.html" data-page-link="personnelAnalytics">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span>Personnel Analytics</span>
 
-                </a>
-                <a class="nav-link" href="care-records.html" data-page-link="care">
-                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
-                    <span>Care Records</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Conversation</div>
+                    <a class="nav-link" href="conversations.html" data-page-link="conversations">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                        <span>Conversations</span>
+                        <span class="nav-badge danger" id="conversationBadge"></span>
+                    </a>
+                    <a class="nav-link" href="service-inquiries.html" data-page-link="serviceInquiries">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        <span>Service Inquiries</span>
 
-                </a>
-                <a class="nav-link" href="reports.html" data-page-link="reports">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <span>Daily Reports</span>
+                    </a>
+                    <a class="nav-link" href="conversation-detail.html" data-page-link="conversationDetail">
+                        <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                        <span>Conversation Detail</span>
 
-                </a>
-                <a class="nav-link" href="users.html" data-page-link="users">
-                    <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>User Management</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Schedule</div>
+                    <a class="nav-link" href="schedule.html" data-page-link="schedule">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                        <span>Schedule Board</span>
 
-                </a>
-                <a class="nav-link" href="security.html" data-page-link="settings">
-                    <i class="fa fa-shield" aria-hidden="true"></i>
-                    <span>Security</span>
+                    </a>
+                    <a class="nav-link" href="appointment-requests.html" data-page-link="appointmentRequests">
+                        <i class="fa fa-video-camera" aria-hidden="true"></i>
+                        <span>Appointments</span>
 
-                </a>
+                    </a>
+                    <a class="nav-link" href="schedule-analytics.html" data-page-link="scheduleAnalytics">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <span>Schedule Analytics</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Care Records</div>
+                    <a class="nav-link" href="care-records.html" data-page-link="care">
+                        <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                        <span>Care Records</span>
+
+                    </a>
+                    <a class="nav-link" href="health-observations.html" data-page-link="healthObservations">
+                        <i class="fa fa-stethoscope" aria-hidden="true"></i>
+                        <span>Health Observations</span>
+
+                    </a>
+                    <a class="nav-link" href="reports.html" data-page-link="reports">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <span>Daily Reports</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Security</div>
+                    <a class="nav-link" href="security.html" data-page-link="settings">
+                        <i class="fa fa-shield" aria-hidden="true"></i>
+                        <span>Security</span>
+
+                    </a>
+                </div>
             </nav>
         </aside>
 
@@ -93,27 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Static resident page</p>
-                        <h2>Resident Profiles</h2>
-                    </div>
-                    <div class="toolbar-line">
-                        <label class="visually-hidden" for="residentSearchStatic">Search residents</label>
-                        <input class="form-control" id="residentSearchStatic" type="search" placeholder="Search name, room, tag">
-                        <button class="btn btn-primary icon-only" type="button" data-action="new-resident" aria-label="Add resident"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                    </div>
-                    <label class="form-label" for="residentCareFilterStatic">Care level</label>
-                    <select class="form-select mb-3" id="residentCareFilterStatic"><option>All care levels</option><option>Level I Assisted</option><option>Level II Assisted</option><option>Level III Intensive</option></select>
-                    <div class="entity-list" id="residentStaticList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident records</div><div class="entity-subtitle">Searchable profile rows hydrate here</div></div></div></div>
+                    <div class="pane-header"><p class="eyebrow mb-1">Personnel module page 1</p><h2>Resident Profiles</h2></div><label class="form-label" for="residentSearch">Search records</label><div class="toolbar-line"><input class="form-control" id="residentSearch" type="search" placeholder="Search name, room, tag"><button class="btn btn-primary icon-only" type="button" data-action="new-resident" aria-label="Add resident"><i class="fa fa-plus"></i></button></div><label class="form-label" for="residentCareFilter">Care level</label><select class="form-select mb-3" id="residentCareFilter"><option>All care levels</option></select><div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident records</div><div class="entity-subtitle">Hydrated from demo data</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Profile, relations, and permissions</p>
-                        <h2>Resident Detail</h2>
-                    </div>
-                    <div class="profile-heading"><div class="profile-heading-main"><div class="avatar resident-avatar">EC</div><div><p class="eyebrow mb-1">Resident Profile</p><h2>Resident details</h2><div class="entity-subtitle">Basic information, relations, permissions</div></div></div><button class="btn btn-light" type="button" data-action="edit-resident">Edit</button></div>
-                    <div class="analytics-grid mb-3"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div></div>
-                    <div class="table-wrap"><table class="table align-middle"><thead><tr><th>Field</th><th>Value</th><th>Status</th></tr></thead><tbody><tr><td>Room</td><td>Loaded from records</td><td><span class="badge badge-soft">Demo</span></td></tr></tbody></table></div>
+                    <div class="profile-heading"><div class="profile-heading-main"><div class="avatar resident-avatar">EC</div><div><p class="eyebrow mb-1">Resident Profile</p><h2>Resident details</h2><div class="entity-subtitle">Relations, permissions, schedules, care records</div></div></div><button class="btn btn-light" type="button" data-action="edit-resident">Edit</button></div><div class="analytics-grid mb-3"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

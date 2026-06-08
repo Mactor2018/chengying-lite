@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - User Management</title>
+    <title>CareBridge - Personnel Analytics</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="users">
+<body data-page="personnelAnalytics">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -47,12 +47,12 @@
                         <span>Residents</span>
 
                     </a>
-                    <a class="nav-link active" href="users.html" data-page-link="users">
+                    <a class="nav-link" href="users.html" data-page-link="users">
                         <i class="fa fa-users" aria-hidden="true"></i>
                         <span>User Management</span>
 
                     </a>
-                    <a class="nav-link" href="personnel-analytics.html" data-page-link="personnelAnalytics">
+                    <a class="nav-link active" href="personnel-analytics.html" data-page-link="personnelAnalytics">
                         <i class="fa fa-bar-chart" aria-hidden="true"></i>
                         <span>Personnel Analytics</span>
 
@@ -126,8 +126,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">RBAC users and account status</p>
-                    <h1 id="viewTitle">User Management</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Resident and account record analytics</p>
+                    <h1 id="viewTitle">Personnel Analytics</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -140,10 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header"><p class="eyebrow mb-1">Personnel module page 2</p><h2>User Filters</h2></div><label class="form-label" for="userSearch">Search accounts</label><div class="toolbar-line"><input class="form-control" id="userSearch" type="search" placeholder="Search user or phone"><button class="btn btn-primary icon-only" type="button" data-action="new-user" aria-label="Add user"><i class="fa fa-plus"></i></button></div><label class="form-label" for="userRoleFilter">Role</label><select class="form-select" id="userRoleFilter"><option>All roles</option></select>
+                    <div class="pane-header"><p class="eyebrow mb-1">Personnel module page 3</p><h2>Module Pages</h2></div><div class="entity-list"><a class="entity-row" href="residents.html"><div class="entity-body"><div class="entity-title">Resident Profiles</div><div class="entity-subtitle">Add, modify, delete, search</div></div></a><a class="entity-row" href="users.html"><div class="entity-body"><div class="entity-title">User Management</div><div class="entity-subtitle">Account CRUD and status</div></div></a></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="section-title"><h2>RBAC Account Records</h2><button class="btn btn-primary" type="button" data-action="new-user">Add User</button></div><div class="table-wrap"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td>Hydrated account</td><td>Role</td><td>Status</td><td>Edit / Delete</td></tr></tbody></table></div><div class="analytics-grid mt-4"><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div><div class="chart-card"><h3>Account status</h3><canvas class="chart-canvas" id="chartAccountStatus" height="220"></canvas></div></div>
+                    <div class="section-title"><h2>Personnel Analytics</h2><span class="badge badge-soft">Database-ready charts</span></div><div class="analytics-grid"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div><div class="chart-card"><h3>Account status</h3><canvas class="chart-canvas" id="chartAccountStatus" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

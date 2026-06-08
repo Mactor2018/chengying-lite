@@ -32,47 +32,94 @@
             </label>
 
             <nav class="nav flex-column app-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Workspace</div>
+                    <a class="nav-link" href="index.html" data-page-link="dashboard">
+                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                        <span class="nav-badge" id="dashboardBadge"></span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Personnel</div>
+                    <a class="nav-link" href="residents.html" data-page-link="residents">
+                        <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                        <span>Residents</span>
 
-                <a class="nav-link" href="index.html" data-page-link="dashboard">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Dashboard</span>
-                    <span class="nav-badge" id="dashboardBadge"></span>
-                </a>
-                <a class="nav-link" href="residents.html" data-page-link="residents">
-                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                    <span>Residents</span>
+                    </a>
+                    <a class="nav-link" href="users.html" data-page-link="users">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <span>User Management</span>
 
-                </a>
-                <a class="nav-link" href="conversations.html" data-page-link="conversations">
-                    <i class="fa fa-comments" aria-hidden="true"></i>
-                    <span>Conversations</span>
-                    <span class="nav-badge danger" id="conversationBadge"></span>
-                </a>
-                <a class="nav-link" href="schedule.html" data-page-link="schedule">
-                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                    <span>Schedule</span>
+                    </a>
+                    <a class="nav-link" href="personnel-analytics.html" data-page-link="personnelAnalytics">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span>Personnel Analytics</span>
 
-                </a>
-                <a class="nav-link active" href="care-records.html" data-page-link="care">
-                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
-                    <span>Care Records</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Conversation</div>
+                    <a class="nav-link" href="conversations.html" data-page-link="conversations">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                        <span>Conversations</span>
+                        <span class="nav-badge danger" id="conversationBadge"></span>
+                    </a>
+                    <a class="nav-link" href="service-inquiries.html" data-page-link="serviceInquiries">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        <span>Service Inquiries</span>
 
-                </a>
-                <a class="nav-link" href="reports.html" data-page-link="reports">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <span>Daily Reports</span>
+                    </a>
+                    <a class="nav-link" href="conversation-detail.html" data-page-link="conversationDetail">
+                        <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                        <span>Conversation Detail</span>
 
-                </a>
-                <a class="nav-link" href="users.html" data-page-link="users">
-                    <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>User Management</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Schedule</div>
+                    <a class="nav-link" href="schedule.html" data-page-link="schedule">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                        <span>Schedule Board</span>
 
-                </a>
-                <a class="nav-link" href="security.html" data-page-link="settings">
-                    <i class="fa fa-shield" aria-hidden="true"></i>
-                    <span>Security</span>
+                    </a>
+                    <a class="nav-link" href="appointment-requests.html" data-page-link="appointmentRequests">
+                        <i class="fa fa-video-camera" aria-hidden="true"></i>
+                        <span>Appointments</span>
 
-                </a>
+                    </a>
+                    <a class="nav-link" href="schedule-analytics.html" data-page-link="scheduleAnalytics">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <span>Schedule Analytics</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Care Records</div>
+                    <a class="nav-link active" href="care-records.html" data-page-link="care">
+                        <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                        <span>Care Records</span>
+
+                    </a>
+                    <a class="nav-link" href="health-observations.html" data-page-link="healthObservations">
+                        <i class="fa fa-stethoscope" aria-hidden="true"></i>
+                        <span>Health Observations</span>
+
+                    </a>
+                    <a class="nav-link" href="reports.html" data-page-link="reports">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <span>Daily Reports</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Security</div>
+                    <a class="nav-link" href="security.html" data-page-link="settings">
+                        <i class="fa fa-shield" aria-hidden="true"></i>
+                        <span>Security</span>
+
+                    </a>
+                </div>
             </nav>
         </aside>
 
@@ -93,21 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Static care records page</p>
-                        <h2>Record Completion</h2>
-                    </div>
-                    <label class="form-label" for="careSearchStatic">Search care records</label><input class="form-control mb-3" id="careSearchStatic" type="search" placeholder="Search resident, caregiver, mood, meal">
-                    <div class="soft-panel"><div class="section-title"><h2>Completion</h2><span class="badge badge-soft">Jun 8</span></div><div class="progress"><div class="progress-bar" style="width:75%"></div></div></div>
+                    <div class="pane-header"><p class="eyebrow mb-1">Care module page 1</p><h2>Record Completion</h2></div><label class="form-label" for="careSearch">Search care records</label><input class="form-control mb-3" id="careSearch" type="search" placeholder="Search resident, caregiver, mood, meal"><div class="soft-panel"><div class="section-title"><h2>Completion</h2><span class="badge badge-soft">Jun 8</span></div><div class="progress"><div class="progress-bar" style="width:75%"></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Forms, review, and analytics</p>
-                        <h2>Care Records & Health Observation</h2>
-                    </div>
-                    <ul class="nav nav-tabs mb-3" role="tablist"><li class="nav-item"><button class="nav-link active" type="button">Daily Care Record</button></li><li class="nav-item"><button class="nav-link" type="button">Health Observation</button></li><li class="nav-item"><button class="nav-link" type="button">Supervisor Review</button></li></ul>
-                    <form class="soft-panel mb-4"><div class="row g-3"><div class="col-md-6"><label class="form-label">Resident</label><select class="form-select"><option>Hydrated residents</option></select></div><div class="col-md-6"><label class="form-label">Date</label><input class="form-control" type="date" value="2026-06-08"></div><div class="col-12"><label class="form-label">Care notes</label><textarea class="form-control" rows="3"></textarea></div></div></form>
-                    <div class="analytics-grid"><div class="chart-card"><h3>Meal status</h3><canvas class="chart-canvas" id="chartMealStatus" height="220"></canvas></div><div class="chart-card"><h3>Sleep status</h3><canvas class="chart-canvas" id="chartSleepStatus" height="220"></canvas></div><div class="chart-card"><h3>Mood status</h3><canvas class="chart-canvas" id="chartMoodStatus" height="220"></canvas></div><div class="chart-card"><h3>Activity participation</h3><canvas class="chart-canvas" id="chartActivityStatus" height="220"></canvas></div><div class="chart-card"><h3>Completion rate</h3><canvas class="chart-canvas" id="chartCareCompletion" height="220"></canvas></div></div>
+                    <div class="section-title"><h2>Care Record Form</h2><span class="badge badge-soft">Caregiver</span></div><div class="soft-panel"><label class="form-label">Care notes</label><textarea class="form-control" rows="3" placeholder="Hydrated form appears here"></textarea></div><div class="analytics-grid mt-4"><div class="chart-card"><h3>Meal status</h3><canvas class="chart-canvas" id="chartMealStatus" height="220"></canvas></div><div class="chart-card"><h3>Completion rate</h3><canvas class="chart-canvas" id="chartCareCompletion" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

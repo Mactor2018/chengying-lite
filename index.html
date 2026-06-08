@@ -32,47 +32,94 @@
             </label>
 
             <nav class="nav flex-column app-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Workspace</div>
+                    <a class="nav-link active" href="index.html" data-page-link="dashboard">
+                        <i class="fa fa-th-large" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                        <span class="nav-badge" id="dashboardBadge"></span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Personnel</div>
+                    <a class="nav-link" href="residents.html" data-page-link="residents">
+                        <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                        <span>Residents</span>
 
-                <a class="nav-link active" href="index.html" data-page-link="dashboard">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Dashboard</span>
-                    <span class="nav-badge" id="dashboardBadge"></span>
-                </a>
-                <a class="nav-link" href="residents.html" data-page-link="residents">
-                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                    <span>Residents</span>
+                    </a>
+                    <a class="nav-link" href="users.html" data-page-link="users">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <span>User Management</span>
 
-                </a>
-                <a class="nav-link" href="conversations.html" data-page-link="conversations">
-                    <i class="fa fa-comments" aria-hidden="true"></i>
-                    <span>Conversations</span>
-                    <span class="nav-badge danger" id="conversationBadge"></span>
-                </a>
-                <a class="nav-link" href="schedule.html" data-page-link="schedule">
-                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                    <span>Schedule</span>
+                    </a>
+                    <a class="nav-link" href="personnel-analytics.html" data-page-link="personnelAnalytics">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span>Personnel Analytics</span>
 
-                </a>
-                <a class="nav-link" href="care-records.html" data-page-link="care">
-                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
-                    <span>Care Records</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Conversation</div>
+                    <a class="nav-link" href="conversations.html" data-page-link="conversations">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                        <span>Conversations</span>
+                        <span class="nav-badge danger" id="conversationBadge"></span>
+                    </a>
+                    <a class="nav-link" href="service-inquiries.html" data-page-link="serviceInquiries">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        <span>Service Inquiries</span>
 
-                </a>
-                <a class="nav-link" href="reports.html" data-page-link="reports">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <span>Daily Reports</span>
+                    </a>
+                    <a class="nav-link" href="conversation-detail.html" data-page-link="conversationDetail">
+                        <i class="fa fa-commenting-o" aria-hidden="true"></i>
+                        <span>Conversation Detail</span>
 
-                </a>
-                <a class="nav-link" href="users.html" data-page-link="users">
-                    <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>User Management</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Schedule</div>
+                    <a class="nav-link" href="schedule.html" data-page-link="schedule">
+                        <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                        <span>Schedule Board</span>
 
-                </a>
-                <a class="nav-link" href="security.html" data-page-link="settings">
-                    <i class="fa fa-shield" aria-hidden="true"></i>
-                    <span>Security</span>
+                    </a>
+                    <a class="nav-link" href="appointment-requests.html" data-page-link="appointmentRequests">
+                        <i class="fa fa-video-camera" aria-hidden="true"></i>
+                        <span>Appointments</span>
 
-                </a>
+                    </a>
+                    <a class="nav-link" href="schedule-analytics.html" data-page-link="scheduleAnalytics">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        <span>Schedule Analytics</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Care Records</div>
+                    <a class="nav-link" href="care-records.html" data-page-link="care">
+                        <i class="fa fa-heartbeat" aria-hidden="true"></i>
+                        <span>Care Records</span>
+
+                    </a>
+                    <a class="nav-link" href="health-observations.html" data-page-link="healthObservations">
+                        <i class="fa fa-stethoscope" aria-hidden="true"></i>
+                        <span>Health Observations</span>
+
+                    </a>
+                    <a class="nav-link" href="reports.html" data-page-link="reports">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <span>Daily Reports</span>
+
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Security</div>
+                    <a class="nav-link" href="security.html" data-page-link="settings">
+                        <i class="fa fa-shield" aria-hidden="true"></i>
+                        <span>Security</span>
+
+                    </a>
+                </div>
             </nav>
         </aside>
 
@@ -93,32 +140,10 @@
 
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Static dashboard page</p>
-                        <h2>Work Queue</h2>
-                    </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                        <div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                    </div>
-                    <div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div>
-                    <div class="entity-list" id="dashboardResidentList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
+                    <div class="pane-header"><p class="eyebrow mb-1">Static dashboard page</p><h2>Work Queue</h2></div><div class="metric-grid static-skeleton"><div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div><div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div></div><div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div><div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
-                    <div class="pane-header">
-                        <p class="eyebrow mb-1">Bootstrap cards and analytics</p>
-                        <h2>Operational Dashboard</h2>
-                    </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div>
-                        <div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div>
-                        <div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div>
-                        <div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="chart-card"><div class="section-title"><h3>Resident care levels</h3></div><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div>
-                        <div class="chart-card"><div class="section-title"><h3>Inquiry status</h3></div><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div>
-                    </div>
+                    <div class="pane-header"><p class="eyebrow mb-1">Bootstrap cards and analytics</p><h2>Operational Dashboard</h2></div><div class="metric-grid static-skeleton"><div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div><div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div><div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div><div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div></div><div class="analytics-grid"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Inquiry status</h3><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>
