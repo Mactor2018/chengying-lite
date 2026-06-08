@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - Dashboard</title>
+    <title>CareBridge - Schedule</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="dashboard">
+<body data-page="schedule">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -33,7 +33,7 @@
 
             <nav class="nav flex-column app-nav">
 
-                <a class="nav-link active" href="index.html" data-page-link="dashboard">
+                <a class="nav-link" href="index.html" data-page-link="dashboard">
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     <span>Dashboard</span>
                     <span class="nav-badge" id="dashboardBadge"></span>
@@ -48,7 +48,7 @@
                     <span>Conversations</span>
                     <span class="nav-badge danger" id="conversationBadge"></span>
                 </a>
-                <a class="nav-link" href="schedule.html" data-page-link="schedule">
+                <a class="nav-link active" href="schedule.html" data-page-link="schedule">
                     <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
                     <span>Schedule</span>
 
@@ -79,8 +79,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
-                    <h1 id="viewTitle">Dashboard</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Planned care tasks, visits, and calls</p>
+                    <h1 id="viewTitle">Schedule</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -94,31 +94,21 @@
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Static dashboard page</p>
-                        <h2>Work Queue</h2>
+                        <p class="eyebrow mb-1">Static schedule page</p>
+                        <h2>Schedule Filters</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                        <div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                    </div>
-                    <div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div>
-                    <div class="entity-list" id="dashboardResidentList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
+                    <label class="form-label" for="scheduleSearchStatic">Search schedules</label><input class="form-control mb-3" id="scheduleSearchStatic" type="search" placeholder="Search resident, title, staff, status">
+                    <label class="form-label" for="scheduleTypeFilterStatic">Schedule type</label><select class="form-select mb-3" id="scheduleTypeFilterStatic"><option>All types</option><option>Daily care task</option><option>Medical schedule</option><option>Activity schedule</option><option>Family visit appointment</option><option>Video call appointment</option></select>
+                    <div class="d-grid gap-2"><button class="btn btn-primary" type="button" data-action="new-schedule">Create Schedule</button><button class="btn btn-light" type="button" data-action="book-appointment">Book Appointment</button></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Bootstrap cards and analytics</p>
-                        <h2>Operational Dashboard</h2>
+                        <p class="eyebrow mb-1">Calendar, appointment requests, and completion</p>
+                        <h2>Schedule Board</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div>
-                        <div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div>
-                        <div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div>
-                        <div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="chart-card"><div class="section-title"><h3>Resident care levels</h3></div><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div>
-                        <div class="chart-card"><div class="section-title"><h3>Inquiry status</h3></div><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div>
-                    </div>
+                    <div class="section-title"><h2>June 8 Schedule Board</h2><span class="badge badge-soft">Visibility aware</span></div>
+                    <div class="timeline mb-4" id="scheduleStaticTimeline"><div class="timeline-item"><div class="timeline-time">09:00</div><div><h3>Schedule rows</h3><p>Hydrated from demo records</p></div><span class="badge badge-soft">Ready</span></div></div>
+                    <div class="analytics-grid"><div class="chart-card"><h3>Schedule types</h3><canvas class="chart-canvas" id="chartScheduleTypes" height="220"></canvas></div><div class="chart-card"><h3>Appointment status</h3><canvas class="chart-canvas" id="chartAppointmentStatus" height="220"></canvas></div><div class="chart-card"><h3>Task completion</h3><canvas class="chart-canvas" id="chartTaskCompletion" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>

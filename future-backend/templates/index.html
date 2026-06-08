@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section-title">
+    <div>
+        <p class="eyebrow mb-1">Future Flask/MySQL Version</p>
+        <h1 class="h3 mb-0">CareBridge implementation scaffold</h1>
+    </div>
+    <span class="badge badge-soft">Static-first UI preserved</span>
+</div>
+
+<div class="module-grid">
+    {% for module in modules %}
+    <article class="app-card">
+        <h3>{{ module.name }}</h3>
+        <p>{{ module.pages }}</p>
+        <p class="mb-0 muted-copy">{{ module.operations }}</p>
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -9,7 +9,20 @@
         userSearch: "",
         userRole: "All roles",
         conversationSearch: "",
-        scheduleType: "All types"
+        scheduleSearch: "",
+        scheduleType: "All types",
+        careSearch: "",
+        reportSearch: ""
+    };
+    var PAGE_URLS = {
+        dashboard: "index.html",
+        residents: "residents.html",
+        conversations: "conversations.html",
+        schedule: "schedule.html",
+        care: "care-records.html",
+        reports: "reports.html",
+        users: "users.html",
+        settings: "security.html"
     };
 
     var defaultState = {
@@ -184,6 +197,10 @@
     var state = loadState();
 
     document.addEventListener("DOMContentLoaded", function () {
+        state.view = currentPage();
+        if (state.view === "conversations") {
+            markConversationRead(state.activeConversationId);
+        }
         bindEvents();
         render();
     });
@@ -209,6 +226,23 @@
 
     function clone(value) {
         return JSON.parse(JSON.stringify(value));
+    }
+
+    function currentPage() {
+        var page = document.body ? document.body.dataset.page : "";
+        return PAGE_URLS[page] ? page : "dashboard";
+    }
+
+    function navigateToView(view) {
+        var target = PAGE_URLS[view] || PAGE_URLS.dashboard;
+        state.view = PAGE_URLS[view] ? view : "dashboard";
+        saveState();
+        var currentPath = window.location.pathname.split("/").pop() || "index.html";
+        if (currentPath === target) {
+            render();
+            return;
+        }
+        window.location.href = target;
     }
 
     function bindEvents() {
@@ -289,16 +323,26 @@
             openResidentModal();
         } else if (action === "edit-resident") {
             openResidentModal(getResident(state.selectedResidentId));
+        } else if (action === "delete-resident") {
+            deleteResident(state.selectedResidentId);
         } else if (action === "new-user") {
             openUserModal();
         } else if (action === "edit-user") {
             openUserModal(getUser(actionButton.dataset.userId));
         } else if (action === "toggle-user") {
             toggleUserStatus(actionButton.dataset.userId);
+        } else if (action === "delete-user") {
+            deleteUser(actionButton.dataset.userId);
         } else if (action === "new-schedule") {
             openScheduleModal();
+        } else if (action === "edit-schedule") {
+            openScheduleModal(getSchedule(actionButton.dataset.scheduleId));
+        } else if (action === "cancel-schedule") {
+            cancelSchedule(actionButton.dataset.scheduleId);
         } else if (action === "book-appointment") {
             openAppointmentModal();
+        } else if (action === "delete-appointment") {
+            deleteAppointment(actionButton.dataset.appointmentId);
         } else if (action === "new-inquiry") {
             openInquiryModal();
         } else if (action === "approve-appointment" || action === "reject-appointment") {
@@ -307,21 +351,26 @@
             completeSchedule(actionButton.dataset.scheduleId);
         } else if (action === "set-inquiry-status") {
             setInquiryStatus(actionButton.dataset.inquiryId, actionButton.dataset.status);
+        } else if (action === "archive-conversation") {
+            archiveConversation(actionButton.dataset.archiveConversationId);
+        } else if (action === "delete-inquiry") {
+            deleteInquiry(actionButton.dataset.inquiryId);
+        } else if (action === "delete-care-record") {
+            deleteCareRecord(actionButton.dataset.recordId);
         } else if (action === "generate-report") {
             generateReport(state.selectedResidentId);
+        } else if (action === "review-report") {
+            reviewReport(state.selectedReportId);
+        } else if (action === "delete-report") {
+            deleteReport(state.selectedReportId);
         } else if (action === "ask-report") {
             createInquiryFromReport();
         } else if (action === "switch-view") {
-            state.view = actionButton.dataset.targetView;
-            saveState();
-            render();
+            navigateToView(actionButton.dataset.targetView);
         } else if (action === "reset-demo") {
             resetDemo();
         } else if (action === "show-audit") {
-            state.view = "settings";
-            saveState();
-            render();
-            toast("Audit log is available in Security.");
+            navigateToView("settings");
         }
     }
 
@@ -335,6 +384,15 @@
         } else if (event.target.id === "conversationSearch") {
             filters.conversationSearch = event.target.value;
             renderConversations();
+        } else if (event.target.id === "scheduleSearch") {
+            filters.scheduleSearch = event.target.value;
+            renderSchedule();
+        } else if (event.target.id === "careSearch") {
+            filters.careSearch = event.target.value;
+            renderCare();
+        } else if (event.target.id === "reportSearch") {
+            filters.reportSearch = event.target.value;
+            renderReports();
         } else if (event.target.id === "commandSearch") {
             applyCommandSearch(event.target.value);
         }
@@ -382,8 +440,9 @@
     }
 
     function render() {
-        document.querySelectorAll("[data-view]").forEach(function (button) {
-            button.classList.toggle("active", button.dataset.view === state.view);
+        state.view = currentPage();
+        document.querySelectorAll("[data-page-link]").forEach(function (link) {
+            link.classList.toggle("active", link.dataset.pageLink === state.view);
         });
         updateNavBadges();
         hydrateModalSelects();
@@ -419,6 +478,7 @@
         } else {
             renderSettings();
         }
+        renderAnalytics();
     }
 
     function renderDashboard() {
@@ -456,6 +516,10 @@
             metricTile("Inquiries", pendingInquiries.length, "Pending or processing", "fa-comments") +
             metricTile("Completion", completionRate() + "%", "Care records today", "fa-check-circle-o") +
             "</div>" +
+            '<div class="analytics-grid mb-3">' +
+            chartCard("Resident care levels", "Database-ready resident distribution", "chartResidentsByCare") +
+            chartCard("Inquiry status", "Service questions by workflow state", "chartInquiryStatus") +
+            "</div>" +
             '<div class="module-grid mb-3">' +
             moduleCard("Personnel & Resident Profiles", "Manage resident-centered identities, family binding, staff assignment, and visibility.", "fa-id-card-o", "residents") +
             moduleCard("Conversation & Service Inquiry", "Keep family-staff questions trackable with owner, status, reply history, and resident context.", "fa-comments", "conversations") +
@@ -483,6 +547,7 @@
             '<div class="entity-list">' + residents.map(renderResidentRow).join("") + "</div>"
         );
         renderResidentDetail();
+        renderAnalytics();
     }
 
     function renderResidentDetail() {
@@ -503,6 +568,10 @@
 
         document.getElementById("detailPane").innerHTML =
             renderResidentHero(resident) +
+            '<div class="analytics-grid mb-3">' +
+            chartCard("Resident care levels", "Searchable profile records by care level", "chartResidentsByCare") +
+            chartCard("Account roles", "Staff, family, and resident account mix", "chartUsersByRole") +
+            "</div>" +
             '<ul class="nav nav-tabs mb-3" role="tablist">' +
             '<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#residentOverview" type="button" role="tab">Overview</button></li>' +
             '<li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#residentRelations" type="button" role="tab">Relations</button></li>' +
@@ -575,22 +644,23 @@
             '<aside class="quick-profile">' +
             renderQuickProfile(resident) +
             (inquiry ? renderInquiryDetail(inquiry) : renderConversationInfo(conversation)) +
+            chartCard("Inquiry status", "Pending, processing, replied, and closed records", "chartInquiryStatus") +
+            chartCard("Conversations by resident", "Searchable message records grouped by resident", "chartConversationResidents") +
             "</aside>" +
             "</div>";
         scrollMessagesToBottom();
+        renderAnalytics();
     }
 
     function renderSchedule() {
-        var type = filters.scheduleType;
-        var schedules = state.schedules.filter(function (item) {
-            return type === "All types" || item.type === type;
-        }).sort(function (a, b) {
+        var schedules = filteredSchedules().sort(function (a, b) {
             return new Date(a.start) - new Date(b.start);
         });
         var appointmentList = state.appointments.map(renderAppointmentRow).join("");
         setListPane(
             "Schedule Filters",
             "Plan first, record outcome later",
+            '<input class="form-control mb-3" id="scheduleSearch" type="search" placeholder="Search resident, title, staff, status" value="' + escapeHtml(filters.scheduleSearch) + '">' +
             '<select class="form-select mb-3" id="scheduleTypeFilter">' +
             option("All types", filters.scheduleType) +
             option("Daily care task", filters.scheduleType) +
@@ -614,17 +684,26 @@
             '<div class="row g-3">' +
             '<div class="col-xl-6">' + renderElderlyTodayPanel(resident) + "</div>" +
             '<div class="col-xl-6">' + renderAppointmentWorkflow() + "</div>" +
+            "</div>" +
+            '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Schedule Analytics</p><h2>Database record charts</h2></div><span class="badge badge-soft">Chart-ready</span></div>' +
+            '<div class="analytics-grid">' +
+            chartCard("Schedule types", "Task, activity, visit, and video records", "chartScheduleTypes") +
+            chartCard("Appointment status", "Pending, approved, and rejected requests", "chartAppointmentStatus") +
+            chartCard("Task completion", "Planned versus completed schedule records", "chartTaskCompletion") +
             "</div>";
+        renderAnalytics();
     }
 
     function renderCare() {
-        var completionRows = state.residents.map(function (resident) {
+        var careResidents = filteredCareResidents();
+        var completionRows = careResidents.map(function (resident) {
             var complete = hasCareRecord(resident.id);
             return '<div class="completion-row"><div><strong>' + escapeHtml(resident.name) + '</strong><div class="entity-subtitle">' + escapeHtml(resident.room + " - " + resident.caregiver) + '</div></div><span class="badge ' + (complete ? "badge-teal" : "badge-amber") + '">' + (complete ? "Completed" : "Missing") + "</span></div>";
         }).join("");
         setListPane(
             "Record Completion",
             "Supervisor view for today",
+            '<input class="form-control mb-3" id="careSearch" type="search" placeholder="Search resident, caregiver, mood, meal" value="' + escapeHtml(filters.careSearch) + '">' +
             '<div class="soft-panel mb-3"><div class="section-title"><h2>' + completionRate() + '% completed</h2><span class="badge badge-soft">Jun 8</span></div><div class="progress"><div class="progress-bar" style="width:' + completionRate() + '%"></div></div></div>' +
             completionRows
         );
@@ -639,18 +718,29 @@
             '<div class="tab-pane fade show active" id="careRecordTab" role="tabpanel">' + renderCareRecordForm() + "</div>" +
             '<div class="tab-pane fade" id="healthTab" role="tabpanel">' + renderHealthObservationForm() + "</div>" +
             '<div class="tab-pane fade" id="reviewTab" role="tabpanel">' + renderSupervisorReview() + "</div>" +
+            "</div>" +
+            '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Care Analytics</p><h2>Trend dashboard from record fields</h2></div><span class="badge badge-soft">Chart-ready</span></div>' +
+            '<div class="analytics-grid">' +
+            chartCard("Meal status", "Distribution from care record rows", "chartMealStatus") +
+            chartCard("Sleep status", "Sleep quality by record category", "chartSleepStatus") +
+            chartCard("Mood status", "Mood distribution from daily records", "chartMoodStatus") +
+            chartCard("Activity participation", "Joined, absent, and short-walk records", "chartActivityStatus") +
+            chartCard("Completion rate", "Completed versus missing today", "chartCareCompletion") +
             "</div>";
+        renderAnalytics();
     }
 
     function renderReports() {
         if (!getReport(state.selectedReportId) && state.reports.length) {
             state.selectedReportId = state.reports[0].id;
         }
+        var reports = filteredReports();
         setListPane(
             "Family Daily Reports",
             "Simplified status summaries",
+            '<input class="form-control mb-3" id="reportSearch" type="search" placeholder="Search resident, date, mood, status" value="' + escapeHtml(filters.reportSearch) + '">' +
             '<div class="d-grid mb-3"><button class="btn btn-primary" type="button" data-action="generate-report"><i class="fa fa-refresh me-2" aria-hidden="true"></i>Generate Selected Report</button></div>' +
-            '<div class="entity-list">' + state.reports.map(renderReportRow).join("") + "</div>"
+            '<div class="entity-list">' + reports.map(renderReportRow).join("") + "</div>"
         );
         var report = getReport(state.selectedReportId);
         if (!report) {
@@ -661,12 +751,13 @@
         document.getElementById("detailPane").innerHTML =
             renderReportDetail(report, resident) +
             '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Historical Trend Dashboard</p><h2>Recent Care Pattern</h2></div><span class="badge badge-soft">Prototype analytics</span></div>' +
-            '<div class="trend-grid">' +
-            renderTrendCard("7-day meal status", [["Normal", 78, "teal"], ["Ate less", 18, "amber"], ["Refused", 4, "violet"]]) +
-            renderTrendCard("7-day sleep quality", [["Good", 62, "teal"], ["Average", 30, "primary"], ["Interrupted", 8, "amber"]]) +
-            renderTrendCard("30-day activity count", [["Joined", 72, "primary"], ["Partial", 20, "violet"], ["Absent", 8, "amber"]]) +
-            renderTrendCard("Mood distribution", [["Stable", 70, "teal"], ["Happy", 16, "primary"], ["Anxious", 14, "amber"]]) +
+            '<div class="analytics-grid">' +
+            chartCard("Meal status", "Database rows grouped by meal status", "chartMealStatus") +
+            chartCard("Sleep quality", "Database rows grouped by sleep status", "chartSleepStatus") +
+            chartCard("Activity count", "Database rows grouped by activity status", "chartActivityStatus") +
+            chartCard("Mood distribution", "Database rows grouped by mood status", "chartMoodStatus") +
             "</div>";
+        renderAnalytics();
     }
 
     function renderUsers() {
@@ -694,9 +785,16 @@
             '<div class="section-title"><div><p class="eyebrow mb-1">RBAC Account List</p><h2>' + users.length + ' users</h2></div><button class="btn btn-primary" type="button" data-action="new-user">Add User</button></div>' +
             '<div class="table-wrap"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Department</th><th>Related residents</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
             users.map(function (user) {
-                return '<tr><td><strong>' + escapeHtml(user.name) + '</strong><div class="entity-subtitle">' + escapeHtml(user.phone) + '</div></td><td>' + escapeHtml(user.role) + '</td><td>' + escapeHtml(user.department || "-") + '</td><td>' + user.residents.length + '</td><td><span class="badge ' + (user.status === "Active" ? "badge-teal" : "badge-amber") + '">' + user.status + '</span></td><td><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="edit-user" data-user-id="' + user.id + '">Edit</button><button class="btn btn-light" type="button" data-action="toggle-user" data-user-id="' + user.id + '">' + (user.status === "Active" ? "Freeze" : "Activate") + "</button></div></td></tr>";
+                return '<tr><td><strong>' + escapeHtml(user.name) + '</strong><div class="entity-subtitle">' + escapeHtml(user.phone) + '</div></td><td>' + escapeHtml(user.role) + '</td><td>' + escapeHtml(user.department || "-") + '</td><td>' + user.residents.length + '</td><td><span class="badge ' + (user.status === "Active" ? "badge-teal" : "badge-amber") + '">' + user.status + '</span></td><td><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="edit-user" data-user-id="' + user.id + '">Edit</button><button class="btn btn-light" type="button" data-action="toggle-user" data-user-id="' + user.id + '">' + (user.status === "Active" ? "Freeze" : "Activate") + '</button><button class="btn btn-light text-danger" type="button" data-action="delete-user" data-user-id="' + user.id + '">Delete</button></div></td></tr>';
             }).join("") +
-            "</tbody></table></div>";
+            "</tbody></table></div>" +
+            '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Personnel Analytics</p><h2>Database record charts</h2></div><span class="badge badge-soft">Chart-ready</span></div>' +
+            '<div class="analytics-grid">' +
+            chartCard("Account roles", "Users grouped by role", "chartUsersByRole") +
+            chartCard("Account status", "Active and frozen account records", "chartAccountStatus") +
+            chartCard("Resident care levels", "Resident profiles grouped by care level", "chartResidentsByCare") +
+            "</div>";
+        renderAnalytics();
     }
 
     function renderSettings() {
@@ -749,6 +847,79 @@
         badge.hidden = count <= 0;
     }
 
+    function renderAnalytics() {
+        if (!window.CareBridgeCharts) {
+            return;
+        }
+        requestAnimationFrame(function () {
+            window.CareBridgeCharts.render(buildAnalyticsPayload());
+        });
+    }
+
+    function buildAnalyticsPayload() {
+        return {
+            residentsByCare: asChart(countBy(state.residents, function (resident) {
+                return resident.careLevel;
+            })),
+            usersByRole: asChart(countBy(state.users, function (user) {
+                return user.role;
+            })),
+            accountStatus: asChart(countBy(state.users, function (user) {
+                return user.status;
+            })),
+            inquiriesByStatus: asChart(countBy(state.inquiries, function (inquiry) {
+                return inquiry.status;
+            })),
+            conversationsByResident: asChart(countBy(state.conversations, function (conversation) {
+                var resident = getResident(conversation.residentId);
+                return resident ? resident.name : "Unassigned";
+            })),
+            schedulesByType: asChart(countBy(state.schedules, function (schedule) {
+                return schedule.type;
+            })),
+            appointmentsByStatus: asChart(countBy(state.appointments, function (appointment) {
+                return appointment.status;
+            })),
+            taskCompletion: asChart(countBy(state.schedules, function (schedule) {
+                return schedule.status;
+            })),
+            mealStatus: asChart(countBy(state.careRecords, function (record) {
+                return record.meal;
+            })),
+            sleepStatus: asChart(countBy(state.careRecords, function (record) {
+                return record.sleep;
+            })),
+            moodStatus: asChart(countBy(state.careRecords, function (record) {
+                return record.mood;
+            })),
+            activityStatus: asChart(countBy(state.careRecords, function (record) {
+                return record.activity;
+            })),
+            careCompletion: asChart({
+                Completed: completedRecordCount(),
+                Missing: missingRecordCount()
+            })
+        };
+    }
+
+    function countBy(collection, accessor) {
+        return collection.reduce(function (result, item) {
+            var key = accessor(item) || "Unknown";
+            result[key] = (result[key] || 0) + 1;
+            return result;
+        }, {});
+    }
+
+    function asChart(values) {
+        var labels = Object.keys(values);
+        return {
+            labels: labels,
+            values: labels.map(function (label) {
+                return values[label];
+            })
+        };
+    }
+
     function renderResidentHero(resident) {
         return '<div class="profile-heading">' +
             '<div class="profile-heading-main">' +
@@ -757,6 +928,7 @@
             "</div>" +
             '<div class="d-flex flex-wrap gap-2 justify-content-end">' +
             '<button class="btn btn-light btn-sm" type="button" data-action="edit-resident"><i class="fa fa-pencil me-1" aria-hidden="true"></i>Edit</button>' +
+            '<button class="btn btn-light btn-sm text-danger" type="button" data-action="delete-resident"><i class="fa fa-trash-o me-1" aria-hidden="true"></i>Delete</button>' +
             '<button class="btn btn-light btn-sm" type="button" data-action="book-appointment"><i class="fa fa-calendar me-1" aria-hidden="true"></i>Appointment</button>' +
             '<button class="btn btn-primary btn-sm" type="button" data-action="new-inquiry"><i class="fa fa-commenting-o me-1" aria-hidden="true"></i>Ask Staff</button>' +
             "</div>" +
@@ -827,6 +999,8 @@
             '<button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Processing">Mark Processing</button>' +
             '<button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Supervisor Review">Request Supervisor Review</button>' +
             '<button class="btn btn-primary" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Closed">Close Inquiry</button>' +
+            '<button class="btn btn-light" type="button" data-action="archive-conversation" data-archive-conversation-id="' + inquiry.conversationId + '">Archive Conversation</button>' +
+            '<button class="btn btn-light text-danger" type="button" data-action="delete-inquiry" data-inquiry-id="' + inquiry.id + '">Delete Inquiry</button>' +
             "</div></div>";
     }
 
@@ -882,14 +1056,15 @@
         var special = state.careRecords.filter(function (record) {
             return /review|risk|unstable|anxious/i.test(record.notes + " " + record.mobility + " " + record.mood);
         });
+        var records = filteredCareRecords();
         return '<div class="row g-3">' +
             '<div class="col-lg-4">' + metricPanel("Total residents", state.residents.length, "fa-id-card-o") + "</div>" +
             '<div class="col-lg-4">' + metricPanel("Completed records", completedRecordCount(), "fa-check-circle-o") + "</div>" +
             '<div class="col-lg-4">' + metricPanel("Special notes", special.length, "fa-exclamation-circle") + "</div>" +
-            '<div class="col-12"><div class="table-wrap"><table class="table align-middle"><thead><tr><th>Resident</th><th>Caregiver</th><th>Meal</th><th>Mood</th><th>Mobility</th><th>Visibility</th></tr></thead><tbody>' +
-            state.careRecords.map(function (record) {
+            '<div class="col-12"><div class="table-wrap"><table class="table align-middle"><thead><tr><th>Resident</th><th>Caregiver</th><th>Meal</th><th>Mood</th><th>Mobility</th><th>Visibility</th><th>Action</th></tr></thead><tbody>' +
+            records.map(function (record) {
                 var resident = getResident(record.residentId);
-                return '<tr><td>' + escapeHtml(resident.name) + '</td><td>' + escapeHtml(record.caregiver) + '</td><td>' + escapeHtml(record.meal) + '</td><td>' + escapeHtml(record.mood) + '</td><td>' + escapeHtml(record.mobility) + '</td><td><span class="badge ' + (record.visible ? "badge-teal" : "badge-amber") + '">' + (record.visible ? "Family visible" : "Staff only") + "</span></td></tr>";
+                return '<tr><td>' + escapeHtml(resident.name) + '</td><td>' + escapeHtml(record.caregiver) + '</td><td>' + escapeHtml(record.meal) + '</td><td>' + escapeHtml(record.mood) + '</td><td>' + escapeHtml(record.mobility) + '</td><td><span class="badge ' + (record.visible ? "badge-teal" : "badge-amber") + '">' + (record.visible ? "Family visible" : "Staff only") + '</span></td><td><button class="btn btn-sm btn-light text-danger" type="button" data-action="delete-care-record" data-record-id="' + record.id + '">Delete</button></td></tr>';
             }).join("") +
             "</tbody></table></div></div></div>";
     }
@@ -897,7 +1072,7 @@
     function renderReportDetail(report, resident) {
         return '<div class="profile-heading">' +
             '<div class="profile-heading-main"><div class="avatar resident-avatar ' + escapeHtml(resident.tone || "") + '">' + initials(resident.name) + '</div><div><p class="eyebrow mb-1">Daily Status Report</p><h2>' + escapeHtml(resident.name) + '</h2><div class="entity-subtitle">' + escapeHtml(report.date) + ' - ' + escapeHtml(report.status) + '</div></div></div>' +
-            '<div class="d-flex gap-2"><button class="btn btn-light" type="button" data-action="ask-report"><i class="fa fa-question-circle me-1" aria-hidden="true"></i>Ask about report</button><button class="btn btn-primary" type="button" data-action="generate-report">Regenerate</button></div>' +
+            '<div class="d-flex flex-wrap gap-2 justify-content-end"><button class="btn btn-light" type="button" data-action="ask-report"><i class="fa fa-question-circle me-1" aria-hidden="true"></i>Ask about report</button><button class="btn btn-light" type="button" data-action="review-report">Mark Reviewed</button><button class="btn btn-light text-danger" type="button" data-action="delete-report">Delete</button><button class="btn btn-primary" type="button" data-action="generate-report">Regenerate</button></div>' +
             "</div>" +
             '<div class="row g-3">' +
             reportBlock("Diet", report.diet) +
@@ -942,7 +1117,9 @@
             '<div class="timeline-time">' + formatTime(item.start) + '</div>' +
             '<div><h3>' + escapeHtml(item.title) + '</h3><p>' + escapeHtml(resident.name + " - " + item.location + " - " + item.staff) + '</p></div>' +
             '<div class="d-flex align-items-center gap-2 flex-wrap justify-content-end"><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span>' +
+            '<button class="btn btn-sm btn-light" type="button" data-action="edit-schedule" data-schedule-id="' + item.id + '">Edit</button>' +
             (item.status === "Planned" ? '<button class="btn btn-sm btn-light" type="button" data-action="complete-schedule" data-schedule-id="' + item.id + '">Complete</button>' : "") +
+            '<button class="btn btn-sm btn-light text-danger" type="button" data-action="cancel-schedule" data-schedule-id="' + item.id + '">Cancel</button>' +
             "</div></div>";
     }
 
@@ -953,6 +1130,7 @@
             '<div class="entity-body"><div class="entity-title">' + escapeHtml(item.type) + '</div><div class="entity-subtitle">' + escapeHtml(resident.name + " - " + formatDateTime(item.time)) + '</div><div class="entity-meta">' + escapeHtml(item.family + ": " + item.purpose) + '</div></div>' +
             '<div class="d-flex flex-column gap-1 align-items-end"><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span>' +
             (item.status === "Pending" ? '<div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="approve-appointment" data-appointment-id="' + item.id + '">Approve</button><button class="btn btn-light" type="button" data-action="reject-appointment" data-appointment-id="' + item.id + '">Reject</button></div>' : "") +
+            '<button class="btn btn-sm btn-light text-danger" type="button" data-action="delete-appointment" data-appointment-id="' + item.id + '">Delete</button>' +
             "</div></div>";
     }
 
@@ -1023,6 +1201,10 @@
 
     function appInfoCard(title, copy, icon) {
         return '<div class="app-card"><div class="card-icon"><i class="fa ' + icon + '" aria-hidden="true"></i></div><h3>' + escapeHtml(title) + '</h3><p class="mb-0">' + escapeHtml(copy) + "</p></div>";
+    }
+
+    function chartCard(title, copy, id) {
+        return '<div class="chart-card"><div class="section-title"><div><p class="eyebrow mb-1">' + escapeHtml(copy) + '</p><h3>' + escapeHtml(title) + '</h3></div></div><canvas class="chart-canvas" id="' + escapeHtml(id) + '" height="220" aria-label="' + escapeHtml(title) + ' chart"></canvas></div>';
     }
 
     function infoCell(label, value) {
@@ -1099,6 +1281,84 @@
         });
     }
 
+    function filteredSchedules() {
+        var type = filters.scheduleType;
+        var q = filters.scheduleSearch.trim().toLowerCase();
+        return state.schedules.filter(function (schedule) {
+            var resident = getResident(schedule.residentId);
+            var recordText = [
+                schedule.title,
+                schedule.type,
+                schedule.location,
+                schedule.staff,
+                schedule.status,
+                schedule.start,
+                resident ? resident.name : ""
+            ].join(" ").toLowerCase();
+            return (type === "All types" || schedule.type === type) && (!q || recordText.indexOf(q) > -1);
+        });
+    }
+
+    function filteredCareResidents() {
+        var q = filters.careSearch.trim().toLowerCase();
+        if (!q) {
+            return state.residents;
+        }
+        return state.residents.filter(function (resident) {
+            var recordText = resident.name + " " + resident.room + " " + resident.caregiver + " " + resident.careLevel;
+            var relatedRecords = state.careRecords.filter(function (record) {
+                return record.residentId === resident.id;
+            }).map(function (record) {
+                return [record.meal, record.sleep, record.mood, record.activity, record.mobility, record.notes].join(" ");
+            }).join(" ");
+            return (recordText + " " + relatedRecords).toLowerCase().indexOf(q) > -1;
+        });
+    }
+
+    function filteredCareRecords() {
+        var q = filters.careSearch.trim().toLowerCase();
+        if (!q) {
+            return state.careRecords;
+        }
+        return state.careRecords.filter(function (record) {
+            var resident = getResident(record.residentId);
+            var recordText = [
+                resident ? resident.name : "",
+                record.caregiver,
+                record.date,
+                record.meal,
+                record.sleep,
+                record.mood,
+                record.activity,
+                record.mobility,
+                record.notes
+            ].join(" ").toLowerCase();
+            return recordText.indexOf(q) > -1;
+        });
+    }
+
+    function filteredReports() {
+        var q = filters.reportSearch.trim().toLowerCase();
+        if (!q) {
+            return state.reports;
+        }
+        return state.reports.filter(function (report) {
+            var resident = getResident(report.residentId);
+            var reportText = [
+                resident ? resident.name : "",
+                report.date,
+                report.status,
+                report.diet,
+                report.sleep,
+                report.mood,
+                report.activity,
+                report.health,
+                report.notes
+            ].join(" ").toLowerCase();
+            return reportText.indexOf(q) > -1;
+        });
+    }
+
     function applyCommandSearch(value) {
         var q = value.trim().toLowerCase();
         if (!q) {
@@ -1109,18 +1369,15 @@
         });
         if (resident) {
             state.selectedResidentId = resident.id;
-            state.view = "residents";
             saveState();
-            render();
+            navigateToView("residents");
             return;
         }
-        var nav = Array.prototype.find.call(document.querySelectorAll("[data-view]"), function (button) {
-            return button.textContent.toLowerCase().indexOf(q) > -1;
+        var nav = Array.prototype.find.call(document.querySelectorAll("[data-page-link]"), function (link) {
+            return link.textContent.toLowerCase().indexOf(q) > -1;
         });
         if (nav) {
-            state.view = nav.dataset.view;
-            saveState();
-            render();
+            navigateToView(nav.dataset.pageLink);
         }
     }
 
@@ -1156,14 +1413,29 @@
         bootstrap.Modal.getOrCreateInstance(document.getElementById("userModal")).show();
     }
 
-    function openScheduleModal() {
+    function openScheduleModal(schedule) {
         hydrateModalSelects();
         document.getElementById("scheduleForm").reset();
-        document.getElementById("scheduleResidentField").value = state.selectedResidentId;
-        var resident = getResident(state.selectedResidentId);
-        document.getElementById("scheduleStaffField").value = resident ? resident.caregiver : "";
-        document.getElementById("scheduleStartField").value = "2026-06-08T09:00";
-        document.getElementById("scheduleEndField").value = "2026-06-08T09:30";
+        document.getElementById("scheduleIdField").value = schedule ? schedule.id : "";
+        document.getElementById("scheduleModalTitle").textContent = schedule ? "Edit Schedule" : "Create Schedule";
+        document.getElementById("scheduleSubmitButton").textContent = schedule ? "Save Schedule" : "Create Schedule";
+        if (schedule) {
+            document.getElementById("scheduleResidentField").value = schedule.residentId;
+            document.getElementById("scheduleTypeField").value = schedule.type;
+            document.getElementById("scheduleTitleField").value = schedule.title;
+            document.getElementById("scheduleLocationField").value = schedule.location;
+            document.getElementById("scheduleStartField").value = schedule.start;
+            document.getElementById("scheduleEndField").value = schedule.end;
+            document.getElementById("scheduleStaffField").value = schedule.staff;
+            document.getElementById("scheduleVisibilityField").value = schedule.visibility;
+            document.getElementById("scheduleRepeatField").value = schedule.repeat;
+        } else {
+            document.getElementById("scheduleResidentField").value = state.selectedResidentId;
+            var resident = getResident(state.selectedResidentId);
+            document.getElementById("scheduleStaffField").value = resident ? resident.caregiver : "";
+            document.getElementById("scheduleStartField").value = "2026-06-08T09:00";
+            document.getElementById("scheduleEndField").value = "2026-06-08T09:30";
+        }
         bootstrap.Modal.getOrCreateInstance(document.getElementById("scheduleModal")).show();
     }
 
@@ -1245,7 +1517,8 @@
     }
 
     function saveScheduleForm() {
-        var id = nextId("s", state.schedules);
+        var id = document.getElementById("scheduleIdField").value || nextId("s", state.schedules);
+        var existing = getSchedule(id);
         var residentId = valueOf("scheduleResidentField");
         var schedule = {
             id: id,
@@ -1258,15 +1531,20 @@
             staff: valueOf("scheduleStaffField"),
             visibility: valueOf("scheduleVisibilityField"),
             repeat: valueOf("scheduleRepeatField"),
-            status: "Planned"
+            status: existing ? existing.status : "Planned"
         };
-        state.schedules.push(schedule);
+        if (existing) {
+            Object.assign(existing, schedule);
+            addAudit("Edited schedule", schedule.title);
+        } else {
+            state.schedules.push(schedule);
+            addAudit("Created schedule", schedule.title);
+        }
         state.selectedResidentId = residentId;
-        addAudit("Created schedule", schedule.title);
         saveState();
         bootstrap.Modal.getInstance(document.getElementById("scheduleModal")).hide();
         render();
-        toast("Schedule created.");
+        toast(existing ? "Schedule saved." : "Schedule created.");
     }
 
     function saveAppointmentForm() {
@@ -1321,11 +1599,10 @@
         });
         state.activeConversationId = conversationId;
         state.selectedResidentId = residentId;
-        state.view = "conversations";
         addAudit("Created service inquiry", title);
         saveState();
         bootstrap.Modal.getInstance(document.getElementById("inquiryModal")).hide();
-        render();
+        navigateToView("conversations");
         toast("Service inquiry created.");
     }
 
@@ -1506,10 +1783,9 @@
             state.reports.push(report);
         }
         state.selectedReportId = report.id;
-        state.view = "reports";
         addAudit("Generated daily report", resident.name);
         saveState();
-        render();
+        navigateToView("reports");
         toast("Daily report generated.");
     }
 
@@ -1546,11 +1822,189 @@
             createdAt: new Date().toISOString()
         });
         state.activeConversationId = conversationId;
-        state.view = "conversations";
         addAudit("Created inquiry from report", resident.name);
         saveState();
-        render();
+        navigateToView("conversations");
         toast("Inquiry created from report.");
+    }
+
+    function deleteResident(id) {
+        var resident = getResident(id);
+        if (!resident) {
+            return;
+        }
+        if (state.residents.length <= 1) {
+            toast("At least one resident is required for the demo.");
+            return;
+        }
+        if (!confirmAction("Delete this resident profile and related demo records?")) {
+            return;
+        }
+        state.users.forEach(function (user) {
+            user.residents = user.residents.filter(function (residentId) {
+                return residentId !== id;
+            });
+        });
+        state.schedules = state.schedules.filter(function (item) { return item.residentId !== id; });
+        state.appointments = state.appointments.filter(function (item) { return item.residentId !== id; });
+        state.careRecords = state.careRecords.filter(function (item) { return item.residentId !== id; });
+        state.observations = state.observations.filter(function (item) { return item.residentId !== id; });
+        state.reports = state.reports.filter(function (item) { return item.residentId !== id; });
+        state.conversations = state.conversations.filter(function (item) { return item.residentId !== id; });
+        state.inquiries = state.inquiries.filter(function (item) { return item.residentId !== id; });
+        state.residents = state.residents.filter(function (item) { return item.id !== id; });
+        state.selectedResidentId = state.residents[0].id;
+        state.activeConversationId = state.conversations[0] ? state.conversations[0].id : "";
+        state.selectedReportId = state.reports[0] ? state.reports[0].id : "";
+        addAudit("Deleted resident profile", resident.name);
+        saveState();
+        render();
+        toast("Resident profile deleted.");
+    }
+
+    function deleteUser(id) {
+        var user = getUser(id);
+        if (!user) {
+            return;
+        }
+        if (state.users.length <= 1) {
+            toast("At least one account is required for the demo.");
+            return;
+        }
+        if (!confirmAction("Delete this account record?")) {
+            return;
+        }
+        state.users = state.users.filter(function (item) {
+            return item.id !== id;
+        });
+        addAudit("Deleted user account", user.name);
+        saveState();
+        renderUsers();
+        toast("User account deleted.");
+    }
+
+    function cancelSchedule(id) {
+        var schedule = getSchedule(id);
+        if (!schedule) {
+            return;
+        }
+        if (!confirmAction("Cancel and remove this schedule record?")) {
+            return;
+        }
+        state.schedules = state.schedules.filter(function (item) {
+            return item.id !== id;
+        });
+        addAudit("Cancelled schedule", schedule.title);
+        saveState();
+        renderSchedule();
+        toast("Schedule cancelled.");
+    }
+
+    function deleteAppointment(id) {
+        var appointment = state.appointments.find(function (item) {
+            return item.id === id;
+        });
+        if (!appointment) {
+            return;
+        }
+        if (!confirmAction("Delete this appointment request?")) {
+            return;
+        }
+        state.appointments = state.appointments.filter(function (item) {
+            return item.id !== id;
+        });
+        addAudit("Deleted appointment request", appointment.type);
+        saveState();
+        renderSchedule();
+        toast("Appointment request deleted.");
+    }
+
+    function archiveConversation(id) {
+        var conversation = getConversation(id);
+        if (!conversation) {
+            return;
+        }
+        conversation.status = "archived";
+        conversation.unread = 0;
+        addAudit("Archived conversation", conversation.title);
+        saveState();
+        renderConversations();
+        toast("Conversation archived.");
+    }
+
+    function deleteInquiry(id) {
+        var inquiry = state.inquiries.find(function (item) {
+            return item.id === id;
+        });
+        if (!inquiry) {
+            return;
+        }
+        if (!confirmAction("Delete this service inquiry and its conversation?")) {
+            return;
+        }
+        state.inquiries = state.inquiries.filter(function (item) {
+            return item.id !== id;
+        });
+        state.conversations = state.conversations.filter(function (item) {
+            return item.id !== inquiry.conversationId;
+        });
+        state.activeConversationId = state.conversations[0] ? state.conversations[0].id : "";
+        addAudit("Deleted service inquiry", inquiry.title);
+        saveState();
+        renderConversations();
+        toast("Service inquiry deleted.");
+    }
+
+    function deleteCareRecord(id) {
+        var record = state.careRecords.find(function (item) {
+            return item.id === id;
+        });
+        if (!record) {
+            return;
+        }
+        var resident = getResident(record.residentId);
+        if (!confirmAction("Delete this care record?")) {
+            return;
+        }
+        state.careRecords = state.careRecords.filter(function (item) {
+            return item.id !== id;
+        });
+        addAudit("Deleted care record", resident ? resident.name : record.id);
+        saveState();
+        renderCare();
+        toast("Care record deleted.");
+    }
+
+    function reviewReport(id) {
+        var report = getReport(id);
+        if (!report) {
+            return;
+        }
+        var resident = getResident(report.residentId);
+        report.status = "Reviewed";
+        addAudit("Reviewed daily report", resident ? resident.name : report.id);
+        saveState();
+        renderReports();
+        toast("Daily report marked reviewed.");
+    }
+
+    function deleteReport(id) {
+        var report = getReport(id);
+        if (!report) {
+            return;
+        }
+        var resident = getResident(report.residentId);
+        if (!confirmAction("Delete this daily report?")) {
+            return;
+        }
+        state.reports = state.reports.filter(function (item) {
+            return item.id !== id;
+        });
+        state.selectedReportId = state.reports[0] ? state.reports[0].id : "";
+        addAudit("Deleted daily report", resident ? resident.name : report.id);
+        saveState();
+        renderReports();
+        toast("Daily report deleted.");
     }
 
     function toggleUserStatus(id) {
@@ -1606,6 +2060,12 @@
     function getConversation(id) {
         return state.conversations.find(function (conversation) {
             return conversation.id === id;
+        });
+    }
+
+    function getSchedule(id) {
+        return state.schedules.find(function (schedule) {
+            return schedule.id === id;
         });
     }
 
@@ -1708,6 +2168,10 @@
             target: target,
             time: new Date().toISOString()
         });
+    }
+
+    function confirmAction(message) {
+        return window.confirm(message);
     }
 
     function addMinutes(iso, minutes) {

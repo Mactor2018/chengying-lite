@@ -327,6 +327,7 @@ textarea {
     border-radius: 8px;
     background: transparent;
     text-align: left;
+    text-decoration: none;
 }
 
 .app-nav .nav-link i {
@@ -840,6 +841,37 @@ textarea {
     gap: 12px;
 }
 
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.analytics-grid .chart-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+}
+
+.chart-card {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+}
+
+.chart-card h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 750;
+}
+
+.chart-canvas {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 220px;
+}
+
 .trend-bars {
     display: grid;
     gap: 9px;
@@ -962,7 +994,8 @@ textarea {
     }
 
     .chat-layout,
-    .trend-grid {
+    .trend-grid,
+    .analytics-grid {
         grid-template-columns: 1fr;
     }
 }

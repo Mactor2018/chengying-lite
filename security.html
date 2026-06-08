@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - Dashboard</title>
+    <title>CareBridge - Security</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="dashboard">
+<body data-page="settings">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -33,7 +33,7 @@
 
             <nav class="nav flex-column app-nav">
 
-                <a class="nav-link active" href="index.html" data-page-link="dashboard">
+                <a class="nav-link" href="index.html" data-page-link="dashboard">
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     <span>Dashboard</span>
                     <span class="nav-badge" id="dashboardBadge"></span>
@@ -68,7 +68,7 @@
                     <span>User Management</span>
 
                 </a>
-                <a class="nav-link" href="security.html" data-page-link="settings">
+                <a class="nav-link active" href="security.html" data-page-link="settings">
                     <i class="fa fa-shield" aria-hidden="true"></i>
                     <span>Security</span>
 
@@ -79,8 +79,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
-                    <h1 id="viewTitle">Dashboard</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Permissions, audit log, and architecture</p>
+                    <h1 id="viewTitle">Security</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -94,31 +94,21 @@
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Static dashboard page</p>
-                        <h2>Work Queue</h2>
+                        <p class="eyebrow mb-1">Static security page</p>
+                        <h2>Security Model</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                        <div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                    </div>
-                    <div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div>
-                    <div class="entity-list" id="dashboardResidentList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
+                    <div class="soft-panel mb-3"><strong>Permission foundation</strong><p class="mb-0 muted-copy">RBAC + resident binding + operation log.</p></div>
+                    <div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Route protection</div><div class="entity-subtitle">Role-based page access</div></div></div><div class="entity-row"><div class="entity-body"><div class="entity-title">Audit log</div><div class="entity-subtitle">Sensitive operations recorded</div></div></div></div>
+                    <button class="btn btn-light w-100 mt-3" type="button" data-action="reset-demo">Reset Demo Data</button>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Bootstrap cards and analytics</p>
-                        <h2>Operational Dashboard</h2>
+                        <p class="eyebrow mb-1">Frontend, backend, database, and audit design</p>
+                        <h2>Course Project Architecture</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div>
-                        <div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div>
-                        <div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div>
-                        <div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="chart-card"><div class="section-title"><h3>Resident care levels</h3></div><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div>
-                        <div class="chart-card"><div class="section-title"><h3>Inquiry status</h3></div><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div>
-                    </div>
+                    <div class="module-grid mb-4"><div class="app-card"><h3>Frontend</h3><p>Static multi-page Bootstrap demo.</p></div><div class="app-card"><h3>Backend</h3><p>Future Flask services.</p></div><div class="app-card"><h3>Database</h3><p>MySQL schema and seed data under future-backend.</p></div><div class="app-card"><h3>Security</h3><p>Password hashing, route protection, audit logs.</p></div></div>
+                    <div class="section-title"><h2>Recent Audit Log</h2><span class="badge badge-amber">Traceable</span></div>
+                    <div class="table-wrap"><table class="table align-middle"><thead><tr><th>Actor</th><th>Action</th><th>Target</th><th>Time</th></tr></thead><tbody><tr><td>Grace Turner</td><td>Generated daily report</td><td>Eleanor Carter</td><td>Jun 8</td></tr></tbody></table></div>
                 </section>
             </div>
         </main>

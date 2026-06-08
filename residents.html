@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - Dashboard</title>
+    <title>CareBridge - Residents</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="dashboard">
+<body data-page="residents">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -33,12 +33,12 @@
 
             <nav class="nav flex-column app-nav">
 
-                <a class="nav-link active" href="index.html" data-page-link="dashboard">
+                <a class="nav-link" href="index.html" data-page-link="dashboard">
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     <span>Dashboard</span>
                     <span class="nav-badge" id="dashboardBadge"></span>
                 </a>
-                <a class="nav-link" href="residents.html" data-page-link="residents">
+                <a class="nav-link active" href="residents.html" data-page-link="residents">
                     <i class="fa fa-id-card-o" aria-hidden="true"></i>
                     <span>Residents</span>
 
@@ -79,8 +79,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
-                    <h1 id="viewTitle">Dashboard</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Personnel & resident profile management</p>
+                    <h1 id="viewTitle">Residents</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -94,31 +94,26 @@
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Static dashboard page</p>
-                        <h2>Work Queue</h2>
+                        <p class="eyebrow mb-1">Static resident page</p>
+                        <h2>Resident Profiles</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                        <div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div>
+                    <div class="toolbar-line">
+                        <label class="visually-hidden" for="residentSearchStatic">Search residents</label>
+                        <input class="form-control" id="residentSearchStatic" type="search" placeholder="Search name, room, tag">
+                        <button class="btn btn-primary icon-only" type="button" data-action="new-resident" aria-label="Add resident"><i class="fa fa-plus" aria-hidden="true"></i></button>
                     </div>
-                    <div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div>
-                    <div class="entity-list" id="dashboardResidentList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
+                    <label class="form-label" for="residentCareFilterStatic">Care level</label>
+                    <select class="form-select mb-3" id="residentCareFilterStatic"><option>All care levels</option><option>Level I Assisted</option><option>Level II Assisted</option><option>Level III Intensive</option></select>
+                    <div class="entity-list" id="residentStaticList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident records</div><div class="entity-subtitle">Searchable profile rows hydrate here</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Bootstrap cards and analytics</p>
-                        <h2>Operational Dashboard</h2>
+                        <p class="eyebrow mb-1">Profile, relations, and permissions</p>
+                        <h2>Resident Detail</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div>
-                        <div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div>
-                        <div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div>
-                        <div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="chart-card"><div class="section-title"><h3>Resident care levels</h3></div><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div>
-                        <div class="chart-card"><div class="section-title"><h3>Inquiry status</h3></div><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div>
-                    </div>
+                    <div class="profile-heading"><div class="profile-heading-main"><div class="avatar resident-avatar">EC</div><div><p class="eyebrow mb-1">Resident Profile</p><h2>Resident details</h2><div class="entity-subtitle">Basic information, relations, permissions</div></div></div><button class="btn btn-light" type="button" data-action="edit-resident">Edit</button></div>
+                    <div class="analytics-grid mb-3"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div></div>
+                    <div class="table-wrap"><table class="table align-middle"><thead><tr><th>Field</th><th>Value</th><th>Status</th></tr></thead><tbody><tr><td>Room</td><td>Loaded from records</td><td><span class="badge badge-soft">Demo</span></td></tr></tbody></table></div>
                 </section>
             </div>
         </main>

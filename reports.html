@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge - Dashboard</title>
+    <title>CareBridge - Daily Reports</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/carebridge.css">
 </head>
 
-<body data-page="dashboard">
+<body data-page="reports">
     <div class="app-shell">
         <aside class="side-nav" aria-label="Primary navigation">
             <div class="profile-strip">
@@ -33,7 +33,7 @@
 
             <nav class="nav flex-column app-nav">
 
-                <a class="nav-link active" href="index.html" data-page-link="dashboard">
+                <a class="nav-link" href="index.html" data-page-link="dashboard">
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     <span>Dashboard</span>
                     <span class="nav-badge" id="dashboardBadge"></span>
@@ -58,7 +58,7 @@
                     <span>Care Records</span>
 
                 </a>
-                <a class="nav-link" href="reports.html" data-page-link="reports">
+                <a class="nav-link active" href="reports.html" data-page-link="reports">
                     <i class="fa fa-file-text-o" aria-hidden="true"></i>
                     <span>Daily Reports</span>
 
@@ -79,8 +79,8 @@
         <main class="main-stage">
             <header class="topbar">
                 <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
-                    <h1 id="viewTitle">Dashboard</h1>
+                    <p class="eyebrow mb-1" id="viewEyebrow">Family-readable resident status reports</p>
+                    <h1 id="viewTitle">Daily Reports</h1>
                 </div>
                 <div class="topbar-actions">
                     <a class="btn btn-light icon-only" href="security.html" aria-label="Audit log">
@@ -94,31 +94,21 @@
             <div class="content-grid">
                 <section class="list-pane" id="listPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Static dashboard page</p>
-                        <h2>Work Queue</h2>
+                        <p class="eyebrow mb-1">Static report page</p>
+                        <h2>Family Daily Reports</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Pending inquiries</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                        <div class="stat-tile"><span>Pending appointments</span><strong>--</strong><span>Hydrated from demo records</span></div>
-                    </div>
-                    <div class="section-title"><h2>Assigned Residents</h2><a class="btn btn-sm btn-light" href="residents.html">Open</a></div>
-                    <div class="entity-list" id="dashboardResidentList"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident list</div><div class="entity-subtitle">Loaded from local demo records</div></div></div></div>
+                    <label class="form-label" for="reportSearchStatic">Search reports</label><input class="form-control mb-3" id="reportSearchStatic" type="search" placeholder="Search resident, date, mood, status">
+                    <button class="btn btn-primary w-100 mb-3" type="button" data-action="generate-report">Generate Selected Report</button>
+                    <div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Report records</div><div class="entity-subtitle">Hydrated from daily reports</div></div></div></div>
                 </section>
                 <section class="detail-pane" id="detailPane" aria-live="polite">
                     <div class="pane-header">
-                        <p class="eyebrow mb-1">Bootstrap cards and analytics</p>
-                        <h2>Operational Dashboard</h2>
+                        <p class="eyebrow mb-1">Report detail and trend dashboard</p>
+                        <h2>Daily Status Report</h2>
                     </div>
-                    <div class="metric-grid static-skeleton">
-                        <div class="stat-tile"><span>Residents</span><strong>--</strong><span>Total active profiles</span></div>
-                        <div class="stat-tile"><span>Staff</span><strong>--</strong><span>Active staff accounts</span></div>
-                        <div class="stat-tile"><span>Inquiries</span><strong>--</strong><span>Pending or processing</span></div>
-                        <div class="stat-tile"><span>Completion</span><strong>--</strong><span>Care records today</span></div>
-                    </div>
-                    <div class="analytics-grid">
-                        <div class="chart-card"><div class="section-title"><h3>Resident care levels</h3></div><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div>
-                        <div class="chart-card"><div class="section-title"><h3>Inquiry status</h3></div><canvas class="chart-canvas" id="chartInquiryStatus" height="220"></canvas></div>
-                    </div>
+                    <div class="profile-heading"><div class="profile-heading-main"><div class="avatar resident-avatar">EC</div><div><p class="eyebrow mb-1">Daily Status Report</p><h2>Report detail</h2><div class="entity-subtitle">Family-readable summary</div></div></div><button class="btn btn-light" type="button" data-action="review-report">Mark Reviewed</button></div>
+                    <div class="row g-3 mb-4"><div class="col-lg-6"><div class="report-block"><h3>Diet</h3><p class="muted-copy mb-0">Hydrated summary</p></div></div><div class="col-lg-6"><div class="report-block"><h3>Sleep</h3><p class="muted-copy mb-0">Hydrated summary</p></div></div></div>
+                    <div class="analytics-grid"><div class="chart-card"><h3>Meal status</h3><canvas class="chart-canvas" id="chartMealStatus" height="220"></canvas></div><div class="chart-card"><h3>Sleep quality</h3><canvas class="chart-canvas" id="chartSleepStatus" height="220"></canvas></div><div class="chart-card"><h3>Activity count</h3><canvas class="chart-canvas" id="chartActivityStatus" height="220"></canvas></div><div class="chart-card"><h3>Mood distribution</h3><canvas class="chart-canvas" id="chartMoodStatus" height="220"></canvas></div></div>
                 </section>
             </div>
         </main>
