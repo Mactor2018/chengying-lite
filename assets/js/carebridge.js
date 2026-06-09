@@ -210,6 +210,7 @@
         if (state.view === "conversationDetail") {
             markConversationRead(state.activeConversationId);
         }
+        configureCommandSearch();
         bindEvents();
         render();
     });
@@ -242,6 +243,14 @@
         return PAGE_URLS[page] ? page : "dashboard";
     }
 
+    function configureCommandSearch() {
+        var input = document.getElementById("commandSearch");
+        if (input) {
+            input.placeholder = "Search";
+            input.setAttribute("aria-label", "Command search");
+        }
+    }
+
     function navigateToView(view) {
         var target = PAGE_URLS[view] || PAGE_URLS.dashboard;
         state.view = PAGE_URLS[view] ? view : "dashboard";
@@ -266,6 +275,11 @@
                 if (input) {
                     input.focus();
                 }
+                return;
+            }
+            if (event.target && event.target.id === "commandSearch" && event.key === "Enter") {
+                event.preventDefault();
+                applyCommandSearch(event.target.value);
             }
         });
     }
@@ -378,6 +392,8 @@
             resetDemo();
         } else if (action === "show-audit") {
             navigateToView("settings");
+        } else if (action === "elderly-action") {
+            handleElderlyAction(actionButton.dataset.elderlyAction);
         }
     }
 
@@ -414,7 +430,7 @@
             filters.reportSearch = event.target.value;
             renderReports();
         } else if (event.target.id === "commandSearch") {
-            applyCommandSearch(event.target.value);
+            event.target.setAttribute("aria-label", event.target.value.trim() ? "Press Enter to search" : "Command search");
         }
     }
 
@@ -428,6 +444,8 @@
         } else if (event.target.id === "scheduleTypeFilter") {
             filters.scheduleType = event.target.value;
             renderSchedule();
+        } else if (event.target.matches("[data-permission]")) {
+            updateResidentPermission(event.target.dataset.permission, event.target.checked);
         }
     }
 
@@ -534,15 +552,15 @@
             "Work Queue",
             "Current operational focus",
             [
-                quickMetric("Pending inquiries", pendingInquiries.length, "danger"),
+                quickMetric("Open inquiries", pendingInquiries.length, "danger"),
                 quickMetric("Pending appointments", pendingAppointments, "warning"),
                 quickMetric("Today schedules", todaySchedules.length, "primary"),
                 quickMetric("Missing records", missingRecords.length, "warning")
             ].join("") +
-            '<div class="section-title mt-3"><h2>Assigned Residents</h2><button class="btn btn-sm btn-light" type="button" data-action="switch-view" data-target-view="residents">Open</button></div>' +
+            '<div class="section-title mt-3"><h2>Assigned Residents</h2></div>' +
             '<div class="entity-list">' + state.residents.map(renderResidentRow).join("") + "</div>" +
-            '<div class="section-title mt-3"><h2>Pending Service Inquiries</h2></div>' +
-            '<div class="entity-list">' + pendingInquiries.map(renderInquiryListRow).join("") + "</div>"
+            '<div class="section-title mt-3"><h2>Open Service Inquiries</h2></div>' +
+            '<div class="entity-list">' + renderEntityRows(pendingInquiries, renderInquiryListRow, "No open inquiries", "New family questions will appear here.") + "</div>"
         );
 
         var rolePanel = renderRolePanel(resident);
@@ -551,7 +569,7 @@
             '<div class="metric-grid">' +
             metricTile("Residents", state.residents.length, "Total active profiles", "fa-id-card-o") +
             metricTile("Staff", activeStaffCount(), "Active staff accounts", "fa-users") +
-            metricTile("Inquiries", pendingInquiries.length, "Pending or processing", "fa-comments") +
+            metricTile("Inquiries", pendingInquiries.length, "Open workflow items", "fa-comments") +
             metricTile("Completion", completionRate() + "%", "Care records today", "fa-check-circle-o") +
             "</div>" +
             '<div class="analytics-grid mb-3">' +
@@ -559,16 +577,22 @@
             chartCard("Inquiry status", "Service questions by workflow state", "chartInquiryStatus") +
             "</div>" +
             '<div class="module-grid mb-3">' +
-            moduleCard("Personnel & Resident Profiles", "Manage resident-centered identities, family binding, staff assignment, and visibility.", "fa-id-card-o", "residents") +
-            moduleCard("Conversation & Service Inquiry", "Keep family-staff questions trackable with owner, status, reply history, and resident context.", "fa-comments", "conversations") +
-            moduleCard("Schedule & Appointment", "Plan care tasks, activities, family visits, video calls, and staff responsibilities.", "fa-calendar-check-o", "schedule") +
-            moduleCard("Care Records & Daily Reports", "Record actual outcomes, health observations, family summaries, and trend dashboards.", "fa-heartbeat", "care") +
+            moduleCard("Personnel & Resident Profiles", "Manage resident-centered identities, family binding, staff assignment, and visibility.", "fa-id-card-o") +
+            moduleCard("Conversation & Service Inquiry", "Keep family-staff questions trackable with owner, status, reply history, and resident context.", "fa-comments") +
+            moduleCard("Schedule & Appointment", "Plan care tasks, activities, family visits, video calls, and staff responsibilities.", "fa-calendar-check-o") +
+            moduleCard("Care Records & Daily Reports", "Record actual outcomes, health observations, family summaries, and trend dashboards.", "fa-heartbeat") +
             "</div>" +
             rolePanel;
     }
 
     function renderResidents() {
         var residents = filteredResidents();
+        if (residents.length && !residents.some(function (resident) {
+            return resident.id === state.selectedResidentId;
+        })) {
+            state.selectedResidentId = residents[0].id;
+            saveState();
+        }
         setListPane(
             "Resident Profiles",
             "Search, filter, and open central resident files",
@@ -582,8 +606,13 @@
             option("Level II Assisted", filters.residentCare) +
             option("Level III Intensive", filters.residentCare) +
             "</select>" +
-            '<div class="entity-list">' + residents.map(renderResidentRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(residents, renderResidentRow, "No matching residents", "Adjust the search or care-level filter.") + "</div>"
         );
+        if (!residents.length) {
+            document.getElementById("detailPane").innerHTML = emptyState("No matching residents", "Adjust the search or care-level filter to open a resident profile.");
+            renderAnalytics();
+            return;
+        }
         renderResidentDetail();
         renderAnalytics();
     }
@@ -627,7 +656,7 @@
             "</div>" +
             '<div class="row g-3">' +
             '<div class="col-xl-6"><div class="section-title"><h2>Today Schedule</h2><button class="btn btn-sm btn-light" data-action="new-schedule" type="button">Create</button></div><div class="timeline">' + schedules.map(renderTimelineItem).join("") + "</div></div>" +
-            '<div class="col-xl-6"><div class="section-title"><h2>Recent Care Records</h2><button class="btn btn-sm btn-light" data-action="switch-view" data-target-view="care" type="button">Open</button></div>' + renderRecordList(records) + "</div>" +
+            '<div class="col-xl-6"><div class="section-title"><h2>Recent Care Records</h2></div>' + renderRecordList(records) + "</div>" +
             "</div>" +
             '<div class="section-title mt-3"><h2>Recent Conversations</h2><button class="btn btn-sm btn-light" type="button" data-action="new-inquiry">Ask Staff</button></div>' +
             '<div class="entity-list">' + conversations.map(renderConversationRow).join("") + "</div>" +
@@ -643,13 +672,13 @@
 
     function renderPersonnelAnalytics() {
         setListPane(
-            "Personnel Module Pages",
-            "Three independent HTML pages for this core module",
-            '<div class="entity-list">' +
-            modulePageRow("Resident Profiles", "Add, edit, delete, and search resident profile records.", "residents.html", "fa-id-card-o") +
-            modulePageRow("User Management", "Add, edit, delete, freeze, activate, and search staff or family accounts.", "users.html", "fa-users") +
-            modulePageRow("Personnel Analytics", "Visual analytics from resident and account records.", "personnel-analytics.html", "fa-bar-chart") +
-            "</div>"
+            "Analytics Summary",
+            "Resident and account record coverage",
+            '<div class="soft-panel mb-3"><strong>Personnel record model</strong><p class="mb-0 muted-copy">Resident profiles, staff accounts, family accounts, role status, and care-level categories are summarized on this page.</p></div>' +
+            quickMetric("Resident records", state.residents.length, "primary") +
+            quickMetric("Account records", state.users.length, "primary") +
+            quickMetric("Active staff", activeStaffCount(), "warning") +
+            quickMetric("Frozen accounts", countFrozenAccounts(), "danger")
         );
 
         document.getElementById("detailPane").innerHTML =
@@ -678,33 +707,35 @@
 
     function renderConversations() {
         var conversations = filteredConversations();
+        var openInquiryRows = openInquiries();
         setListPane(
             "Conversation Inbox",
             "Unread resident-specific communication",
             '<div class="toolbar-line">' +
-            '<input class="form-control" id="conversationSearch" type="search" placeholder="Search resident, title, message" value="' + escapeHtml(filters.conversationSearch) + '">' +
+            '<input class="form-control" id="conversationSearch" type="search" placeholder="Search conversations" value="' + escapeHtml(filters.conversationSearch) + '">' +
             '<button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus" aria-hidden="true"></i></button>' +
             "</div>" +
-            '<div class="entity-list">' + conversations.map(renderConversationRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(conversations, renderConversationRow, "No matching conversations", "Adjust the search or create a new inquiry.") + "</div>"
         );
 
         var unread = state.conversations.filter(function (conversation) {
-            return Number(conversation.unread || 0) > 0;
+            return conversation.status !== "archived" && Number(conversation.unread || 0) > 0;
         });
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">Inbox Summary</p><h2>Conversation Triage</h2></div><button class="btn btn-primary btn-sm" type="button" data-action="new-inquiry">Create Inquiry</button></div>' +
             '<div class="metric-grid">' +
-            metricTile("Conversations", state.conversations.length, "Searchable message spaces", "fa-comments") +
+            metricTile("Conversations", conversations.length, "Visible message spaces", "fa-comments") +
             metricTile("Unread", unreadConversationCount(), "Messages needing review", "fa-bell-o") +
-            metricTile("Open inquiries", openInquiries().length, "Pending or processing", "fa-question-circle") +
-            metricTile("Residents", state.residents.length, "Linked profile contexts", "fa-id-card-o") +
+            metricTile("Open inquiries", openInquiryRows.length, "Pending, processing, or review", "fa-question-circle") +
+            metricTile("Messages", totalConversationMessages(), "Threaded message rows", "fa-commenting-o") +
             "</div>" +
             '<div class="row g-3 mb-3">' +
-            '<div class="col-xl-6"><div class="section-title"><h2>Unread Conversations</h2><a class="btn btn-sm btn-light" href="conversation-detail.html">Open Detail</a></div><div class="entity-list">' + (unread.length ? unread.map(renderConversationRow).join("") : emptyState("No unread messages", "Opening a conversation detail clears its unread badge.")) + "</div></div>" +
-            '<div class="col-xl-6"><div class="section-title"><h2>Open Service Inquiries</h2><a class="btn btn-sm btn-light" href="service-inquiries.html">Manage</a></div><div class="entity-list">' + openInquiries().map(renderInquiryListRow).join("") + "</div></div>" +
+            '<div class="col-xl-6"><div class="section-title"><h2>Unread Conversations</h2></div><div class="entity-list">' + (unread.length ? unread.map(renderConversationRow).join("") : emptyState("No unread messages", "Opening a conversation detail clears its unread badge.")) + "</div></div>" +
+            '<div class="col-xl-6"><div class="section-title"><h2>Open Service Inquiries</h2></div><div class="entity-list">' + renderEntityRows(openInquiryRows, renderInquiryListRow, "No open inquiries", "Replied or closed inquiries no longer appear here.") + "</div></div>" +
             "</div>" +
             '<div class="analytics-grid">' +
             chartCard("Inquiry status", "Pending, processing, replied, and closed records", "chartInquiryStatus") +
+            chartCard("Message volume", "Chat messages counted by conversation", "chartConversationMessages") +
             chartCard("Conversations by resident", "Searchable message records grouped by resident", "chartConversationResidents") +
             "</div>";
         renderAnalytics();
@@ -716,16 +747,16 @@
             "Inquiry Board",
             "Create, search, update, and delete service inquiries",
             '<div class="toolbar-line">' +
-            '<input class="form-control" id="inquirySearch" type="search" placeholder="Search resident, title, description, status" value="' + escapeHtml(filters.inquirySearch) + '">' +
+            '<input class="form-control" id="inquirySearch" type="search" placeholder="Search inquiries" value="' + escapeHtml(filters.inquirySearch) + '">' +
             '<button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus" aria-hidden="true"></i></button>' +
             "</div>" +
-            '<div class="entity-list">' + inquiries.map(renderInquiryListRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(inquiries, renderInquiryListRow, "No matching inquiries", "Adjust the search or create a new service inquiry.") + "</div>"
         );
 
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">Service Inquiry Records</p><h2>' + inquiries.length + ' inquiries</h2></div><button class="btn btn-primary" type="button" data-action="new-inquiry">Create Inquiry</button></div>' +
-            '<div class="table-wrap"><table class="table align-middle"><thead><tr><th>Inquiry</th><th>Resident</th><th>Assigned</th><th>Status</th><th>Priority</th><th>Action</th></tr></thead><tbody>' +
-            inquiries.map(renderInquiryTableRow).join("") +
+            '<div class="table-wrap responsive-table"><table class="table align-middle"><thead><tr><th>Inquiry</th><th>Resident</th><th>Assigned</th><th>Status</th><th>Priority</th><th>Action</th></tr></thead><tbody>' +
+            renderTableRows(inquiries, renderInquiryTableRow, 6, "No matching inquiries", "Adjust the search to restore inquiry rows.") +
             "</tbody></table></div>" +
             '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Inquiry Analytics</p><h2>Workflow distribution</h2></div><span class="badge badge-soft">Database-ready</span></div>' +
             '<div class="analytics-grid">' +
@@ -736,8 +767,28 @@
     }
 
     function renderConversationDetail() {
-        var conversation = getConversation(state.activeConversationId) || state.conversations[0];
+        var visibleConversations = filteredConversations();
+        var conversation = getConversation(state.activeConversationId);
+        if (conversation && visibleConversations.length && !visibleConversations.some(function (item) {
+            return item.id === conversation.id;
+        })) {
+            conversation = visibleConversations[0];
+        } else if (conversation && !visibleConversations.length && filters.conversationSearch.trim()) {
+            conversation = null;
+        }
+        if (!conversation || conversation.status === "archived") {
+            conversation = visibleConversations[0];
+        }
         if (!conversation) {
+            setListPane(
+                "Conversation Detail",
+                "Open another thread without leaving the detail page",
+                '<div class="toolbar-line">' +
+                '<input class="form-control" id="conversationSearch" type="search" placeholder="Search threads" value="' + escapeHtml(filters.conversationSearch) + '">' +
+                '<button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus" aria-hidden="true"></i></button>' +
+                "</div>" +
+                '<div class="entity-list">' + emptyState("No matching conversations", "Adjust the search or create a new inquiry.") + "</div>"
+            );
             document.getElementById("detailPane").innerHTML = emptyState("No conversations yet", "Create a service inquiry to start a resident communication space.");
             return;
         }
@@ -754,10 +805,10 @@
             "Conversation Detail",
             "Open another thread without leaving the detail page",
             '<div class="toolbar-line">' +
-            '<input class="form-control" id="conversationSearch" type="search" placeholder="Search resident, title, message" value="' + escapeHtml(filters.conversationSearch) + '">' +
+            '<input class="form-control" id="conversationSearch" type="search" placeholder="Search threads" value="' + escapeHtml(filters.conversationSearch) + '">' +
             '<button class="btn btn-primary icon-only" type="button" data-action="new-inquiry" aria-label="Create inquiry"><i class="fa fa-plus" aria-hidden="true"></i></button>' +
             "</div>" +
-            '<div class="entity-list">' + filteredConversations().map(renderConversationRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(visibleConversations, renderConversationRow, "No matching conversations", "Adjust the search or create a new inquiry.") + "</div>"
         );
 
         document.getElementById("detailPane").innerHTML =
@@ -791,7 +842,7 @@
         setListPane(
             "Schedule Filters",
             "Plan first, record outcome later",
-            '<input class="form-control mb-3" id="scheduleSearch" type="search" placeholder="Search resident, title, staff, status" value="' + escapeHtml(filters.scheduleSearch) + '">' +
+            '<input class="form-control mb-3" id="scheduleSearch" type="search" placeholder="Search schedules" value="' + escapeHtml(filters.scheduleSearch) + '">' +
             '<select class="form-select mb-3" id="scheduleTypeFilter">' +
             option("All types", filters.scheduleType) +
             option("Daily care task", filters.scheduleType) +
@@ -802,19 +853,16 @@
             "</select>" +
             '<div class="d-grid gap-2 mb-3">' +
             '<button class="btn btn-primary" type="button" data-action="new-schedule"><i class="fa fa-plus me-2" aria-hidden="true"></i>Create Schedule</button>' +
-            '<a class="btn btn-light" href="appointment-requests.html"><i class="fa fa-video-camera me-2" aria-hidden="true"></i>Appointment Requests</a>' +
             "</div>" +
-            '<div class="entity-list">' +
-            modulePageRow("Schedule Board", "Create, edit, complete, cancel, and search schedule records.", "schedule.html", "fa-calendar-check-o") +
-            modulePageRow("Appointment Requests", "Create visit or video call requests and approve or reject them.", "appointment-requests.html", "fa-video-camera") +
-            modulePageRow("Schedule Analytics", "Visual charts from schedule and appointment records.", "schedule-analytics.html", "fa-bar-chart") +
-            "</div>"
+            quickMetric("Visible schedules", schedules.length, "primary") +
+            quickMetric("Pending appointments", pendingAppointmentCount(), "warning") +
+            quickMetric("Completed tasks", completedScheduleCount(), "primary")
         );
 
         var resident = getResident(state.selectedResidentId);
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">Staff Calendar</p><h2>June 8 Schedule Board</h2></div><span class="badge badge-soft">Visibility aware</span></div>' +
-            '<div class="timeline mb-4">' + schedules.map(renderTimelineItem).join("") + "</div>" +
+            '<div class="timeline mb-4">' + renderEntityRows(schedules, renderTimelineItem, "No matching schedules", "Adjust the search or create a schedule.") + "</div>" +
             '<div class="row g-3">' +
             '<div class="col-xl-6">' + renderElderlyTodayPanel(resident) + "</div>" +
             '<div class="col-xl-6">' + renderAppointmentWorkflow() + "</div>" +
@@ -827,18 +875,17 @@
         setListPane(
             "Appointment Requests",
             "Visit and video call workflow",
-            '<input class="form-control mb-3" id="appointmentSearch" type="search" placeholder="Search resident, family, type, date, status" value="' + escapeHtml(filters.appointmentSearch) + '">' +
+            '<input class="form-control mb-3" id="appointmentSearch" type="search" placeholder="Search appointments" value="' + escapeHtml(filters.appointmentSearch) + '">' +
             '<div class="d-grid gap-2 mb-3">' +
             '<button class="btn btn-primary" type="button" data-action="book-appointment"><i class="fa fa-plus me-2" aria-hidden="true"></i>Book Appointment</button>' +
-            '<a class="btn btn-light" href="schedule.html"><i class="fa fa-calendar-check-o me-2" aria-hidden="true"></i>Back to Schedule</a>' +
             "</div>" +
-            '<div class="entity-list">' + appointments.map(renderAppointmentRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(appointments, renderAppointmentRow, "No matching appointments", "Adjust the search or book an appointment.") + "</div>"
         );
 
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">Appointment Approval</p><h2>' + appointments.length + ' family visit and video call requests</h2></div><button class="btn btn-primary" type="button" data-action="book-appointment">New Request</button></div>' +
-            '<div class="table-wrap mb-4"><table class="table align-middle"><thead><tr><th>Type</th><th>Resident</th><th>Family</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
-            appointments.map(renderAppointmentTableRow).join("") +
+            '<div class="table-wrap responsive-table mb-4"><table class="table align-middle"><thead><tr><th>Type</th><th>Resident</th><th>Family</th><th>Time</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
+            renderTableRows(appointments, renderAppointmentTableRow, 6, "No matching appointments", "Adjust the search to restore appointment rows.") +
             "</tbody></table></div>" +
             '<div class="row g-3">' +
             '<div class="col-xl-6">' + renderAppointmentWorkflow() + "</div>" +
@@ -849,13 +896,13 @@
 
     function renderScheduleAnalytics() {
         setListPane(
-            "Schedule Module Pages",
-            "Three independent HTML pages for this core module",
-            '<div class="entity-list">' +
-            modulePageRow("Schedule Board", "Schedule CRUD and searchable calendar records.", "schedule.html", "fa-calendar-check-o") +
-            modulePageRow("Appointment Requests", "Visit and video call request workflow.", "appointment-requests.html", "fa-video-camera") +
-            modulePageRow("Schedule Analytics", "Charts from schedule and appointment records.", "schedule-analytics.html", "fa-bar-chart") +
-            "</div>"
+            "Analytics Summary",
+            "Schedule and appointment record coverage",
+            '<div class="soft-panel mb-3"><strong>Schedule record model</strong><p class="mb-0 muted-copy">Care tasks, activities, family visits, video calls, approval states, and completion states are summarized on this page.</p></div>' +
+            quickMetric("Schedule records", state.schedules.length, "primary") +
+            quickMetric("Appointment records", state.appointments.length, "primary") +
+            quickMetric("Pending approvals", pendingAppointmentCount(), "warning") +
+            quickMetric("Completed tasks", completedScheduleCount(), "primary")
         );
 
         document.getElementById("detailPane").innerHTML =
@@ -891,14 +938,9 @@
         setListPane(
             "Record Completion",
             "Supervisor view for today",
-            '<input class="form-control mb-3" id="careSearch" type="search" placeholder="Search resident, caregiver, mood, meal" value="' + escapeHtml(filters.careSearch) + '">' +
+            '<input class="form-control mb-3" id="careSearch" type="search" placeholder="Search care records" value="' + escapeHtml(filters.careSearch) + '">' +
             '<div class="soft-panel mb-3"><div class="section-title"><h2>' + completionRate() + '% completed</h2><span class="badge badge-soft">Jun 8</span></div><div class="progress"><div class="progress-bar" style="width:' + completionRate() + '%"></div></div></div>' +
-            completionRows +
-            '<div class="entity-list mt-3">' +
-            modulePageRow("Care Records", "Submit, replace, delete, and search daily care records.", "care-records.html", "fa-heartbeat") +
-            modulePageRow("Health Observations", "Submit and search nurse vitals and medication notes.", "health-observations.html", "fa-stethoscope") +
-            modulePageRow("Daily Reports", "Generate, review, delete, search, and analyze family reports.", "reports.html", "fa-file-text-o") +
-            "</div>"
+            (completionRows || emptyState("No matching care records", "Adjust the search to restore completion rows."))
         );
 
         document.getElementById("detailPane").innerHTML =
@@ -926,18 +968,18 @@
         setListPane(
             "Health Observation Search",
             "Nurse vitals and medication records",
-            '<input class="form-control mb-3" id="observationSearch" type="search" placeholder="Search resident, nurse, vitals, medication, notes" value="' + escapeHtml(filters.observationSearch) + '">' +
-            '<div class="entity-list">' + observations.map(renderObservationRow).join("") + "</div>"
+            '<input class="form-control mb-3" id="observationSearch" type="search" placeholder="Search observations" value="' + escapeHtml(filters.observationSearch) + '">' +
+            '<div class="entity-list">' + renderEntityRows(observations, renderObservationRow, "No matching observations", "Adjust the search or submit a nurse observation.") + "</div>"
         );
 
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">Health Observation</p><h2>Nurse record entry</h2></div><span class="badge badge-soft">Care module page 2</span></div>' +
             '<div class="row g-3 mb-4">' +
-            '<div class="col-xl-7">' + renderHealthObservationForm() + "</div>" +
-            '<div class="col-xl-5">' +
+            '<div class="col-12">' + renderHealthObservationForm() + "</div>" +
+            '<div class="col-12">' +
             '<div class="soft-panel h-100"><div class="section-title"><h2>Observation Records</h2><span class="badge badge-teal">' + observations.length + ' rows</span></div>' +
-            '<div class="table-wrap"><table class="table align-middle mb-0"><thead><tr><th>Resident</th><th>Vitals</th><th>Medication</th><th>Time</th></tr></thead><tbody>' +
-            observations.map(renderObservationTableRow).join("") +
+            '<div class="table-wrap responsive-table"><table class="table align-middle mb-0"><thead><tr><th>Resident</th><th>Vitals</th><th>Medication</th><th>Time</th></tr></thead><tbody>' +
+            renderTableRows(observations, renderObservationTableRow, 4, "No matching observations", "Adjust the search to restore observation rows.") +
             "</tbody></table></div></div></div></div>" +
             '<div class="analytics-grid">' +
             chartCard("Meal status", "Care record context for health review", "chartMealStatus") +
@@ -952,13 +994,24 @@
             state.selectedReportId = state.reports[0].id;
         }
         var reports = filteredReports();
+        if (reports.length && !reports.some(function (report) {
+            return report.id === state.selectedReportId;
+        })) {
+            state.selectedReportId = reports[0].id;
+            saveState();
+        }
         setListPane(
             "Family Daily Reports",
             "Simplified status summaries",
-            '<input class="form-control mb-3" id="reportSearch" type="search" placeholder="Search resident, date, mood, status" value="' + escapeHtml(filters.reportSearch) + '">' +
+            '<input class="form-control mb-3" id="reportSearch" type="search" placeholder="Search reports" value="' + escapeHtml(filters.reportSearch) + '">' +
             '<div class="d-grid mb-3"><button class="btn btn-primary" type="button" data-action="generate-report"><i class="fa fa-refresh me-2" aria-hidden="true"></i>Generate Selected Report</button></div>' +
-            '<div class="entity-list">' + reports.map(renderReportRow).join("") + "</div>"
+            '<div class="entity-list">' + renderEntityRows(reports, renderReportRow, "No matching reports", "Adjust the search or generate a report.") + "</div>"
         );
+        if (!reports.length && filters.reportSearch.trim()) {
+            document.getElementById("detailPane").innerHTML = emptyState("No matching reports", "Adjust the search to open a report detail.");
+            renderAnalytics();
+            return;
+        }
         var report = getReport(state.selectedReportId);
         if (!report) {
             document.getElementById("detailPane").innerHTML = emptyState("No reports generated", "Submit a care record and generate a family report.");
@@ -995,15 +1048,17 @@
             option("Activity Staff", filters.userRole) +
             option("Family Member", filters.userRole) +
             option("Elderly Resident", filters.userRole) +
-            "</select>"
+            "</select>" +
+            '<div class="section-title mt-3"><h2>Filtered Accounts</h2><span class="badge badge-soft">' + users.length + "</span></div>" +
+            '<div class="entity-list">' + renderEntityRows(users, renderUserListRow, "No matching users", "Adjust the search or role filter.") + "</div>"
         );
 
         document.getElementById("detailPane").innerHTML =
             '<div class="section-title"><div><p class="eyebrow mb-1">RBAC Account List</p><h2>' + users.length + ' users</h2></div><button class="btn btn-primary" type="button" data-action="new-user">Add User</button></div>' +
-            '<div class="table-wrap"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Department</th><th>Related residents</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
-            users.map(function (user) {
-                return '<tr><td><strong>' + escapeHtml(user.name) + '</strong><div class="entity-subtitle">' + escapeHtml(user.phone) + '</div></td><td>' + escapeHtml(user.role) + '</td><td>' + escapeHtml(user.department || "-") + '</td><td>' + user.residents.length + '</td><td><span class="badge ' + (user.status === "Active" ? "badge-teal" : "badge-amber") + '">' + user.status + '</span></td><td><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="edit-user" data-user-id="' + user.id + '">Edit</button><button class="btn btn-light" type="button" data-action="toggle-user" data-user-id="' + user.id + '">' + (user.status === "Active" ? "Freeze" : "Activate") + '</button><button class="btn btn-light text-danger" type="button" data-action="delete-user" data-user-id="' + user.id + '">Delete</button></div></td></tr>';
-            }).join("") +
+            '<div class="table-wrap responsive-table"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Department</th><th>Related residents</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
+            renderTableRows(users, function (user) {
+                return '<tr><td data-label="User"><strong>' + escapeHtml(user.name) + '</strong><div class="entity-subtitle">' + escapeHtml(user.phone) + '</div></td><td data-label="Role">' + escapeHtml(user.role) + '</td><td data-label="Department">' + escapeHtml(user.department || "-") + '</td><td data-label="Related residents">' + user.residents.length + '</td><td data-label="Status"><span class="badge ' + (user.status === "Active" ? "badge-teal" : "badge-amber") + '">' + user.status + '</span></td><td data-label="Action"><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="edit-user" data-user-id="' + user.id + '">Edit</button><button class="btn btn-light" type="button" data-action="toggle-user" data-user-id="' + user.id + '">' + (user.status === "Active" ? "Freeze" : "Activate") + '</button><button class="btn btn-light text-danger" type="button" data-action="delete-user" data-user-id="' + user.id + '">Delete</button></div></td></tr>';
+            }, 6, "No matching users", "Adjust the search or role filter to restore account rows.") +
             "</tbody></table></div>" +
             '<div class="section-title mt-4"><div><p class="eyebrow mb-1">Personnel Analytics</p><h2>Database record charts</h2></div><span class="badge badge-soft">Chart-ready</span></div>' +
             '<div class="analytics-grid">' +
@@ -1091,6 +1146,14 @@
                 var resident = getResident(conversation.residentId);
                 return resident ? resident.name : "Unassigned";
             })),
+            messagesByConversation: {
+                labels: state.conversations.map(function (conversation) {
+                    return conversation.title;
+                }),
+                values: state.conversations.map(function (conversation) {
+                    return (conversation.messages || []).length;
+                })
+            },
             schedulesByType: asChart(countBy(state.schedules, function (schedule) {
                 return schedule.type;
             })),
@@ -1125,6 +1188,12 @@
             result[key] = (result[key] || 0) + 1;
             return result;
         }, {});
+    }
+
+    function totalConversationMessages() {
+        return state.conversations.reduce(function (total, conversation) {
+            return total + (conversation.messages ? conversation.messages.length : 0);
+        }, 0);
     }
 
     function asChart(values) {
@@ -1278,11 +1347,11 @@
             '<div class="col-lg-4">' + metricPanel("Total residents", state.residents.length, "fa-id-card-o") + "</div>" +
             '<div class="col-lg-4">' + metricPanel("Completed records", completedRecordCount(), "fa-check-circle-o") + "</div>" +
             '<div class="col-lg-4">' + metricPanel("Special notes", special.length, "fa-exclamation-circle") + "</div>" +
-            '<div class="col-12"><div class="table-wrap"><table class="table align-middle"><thead><tr><th>Resident</th><th>Caregiver</th><th>Meal</th><th>Mood</th><th>Mobility</th><th>Visibility</th><th>Action</th></tr></thead><tbody>' +
-            records.map(function (record) {
+            '<div class="col-12"><div class="table-wrap responsive-table"><table class="table align-middle"><thead><tr><th>Resident</th><th>Caregiver</th><th>Meal</th><th>Mood</th><th>Mobility</th><th>Visibility</th><th>Action</th></tr></thead><tbody>' +
+            renderTableRows(records, function (record) {
                 var resident = getResident(record.residentId);
-                return '<tr><td>' + escapeHtml(resident.name) + '</td><td>' + escapeHtml(record.caregiver) + '</td><td>' + escapeHtml(record.meal) + '</td><td>' + escapeHtml(record.mood) + '</td><td>' + escapeHtml(record.mobility) + '</td><td><span class="badge ' + (record.visible ? "badge-teal" : "badge-amber") + '">' + (record.visible ? "Family visible" : "Staff only") + '</span></td><td><button class="btn btn-sm btn-light text-danger" type="button" data-action="delete-care-record" data-record-id="' + record.id + '">Delete</button></td></tr>';
-            }).join("") +
+                return '<tr><td data-label="Resident">' + escapeHtml(resident.name) + '</td><td data-label="Caregiver">' + escapeHtml(record.caregiver) + '</td><td data-label="Meal">' + escapeHtml(record.meal) + '</td><td data-label="Mood">' + escapeHtml(record.mood) + '</td><td data-label="Mobility">' + escapeHtml(record.mobility) + '</td><td data-label="Visibility"><span class="badge ' + (record.visible ? "badge-teal" : "badge-amber") + '">' + (record.visible ? "Family visible" : "Staff only") + '</span></td><td data-label="Action"><button class="btn btn-sm btn-light text-danger" type="button" data-action="delete-care-record" data-record-id="' + record.id + '">Delete</button></td></tr>';
+            }, 7, "No matching care records", "Adjust the search to restore review rows.") +
             "</tbody></table></div></div></div>";
     }
 
@@ -1328,9 +1397,17 @@
             "</button>";
     }
 
+    function renderUserListRow(user) {
+        return '<div class="entity-row static-row">' +
+            '<div class="avatar avatar-small avatar-staff">' + initials(user.name) + '</div>' +
+            '<div class="entity-body"><div class="entity-title">' + escapeHtml(user.name) + '</div><div class="entity-subtitle">' + escapeHtml(user.role + " - " + user.department) + '</div><div class="entity-meta">' + escapeHtml(user.residents.length + " linked residents") + '</div></div>' +
+            '<span class="badge ' + (user.status === "Active" ? "badge-teal" : "badge-amber") + '">' + escapeHtml(user.status) + "</span>" +
+            "</div>";
+    }
+
     function renderInquiryTableRow(inquiry) {
         var resident = getResident(inquiry.residentId);
-        return '<tr><td><strong>' + escapeHtml(inquiry.title) + '</strong><div class="entity-subtitle">' + escapeHtml(inquiry.description) + '</div></td><td>' + escapeHtml(resident ? resident.name : "Unassigned") + '</td><td>' + escapeHtml(inquiry.assignedTo) + '</td><td><span class="badge ' + inquiryBadge(inquiry.status) + '">' + escapeHtml(inquiry.status) + '</span></td><td>' + escapeHtml(inquiry.priority) + '</td><td><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Processing">Processing</button><button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Closed">Close</button><button class="btn btn-light text-danger" type="button" data-action="delete-inquiry" data-inquiry-id="' + inquiry.id + '">Delete</button></div></td></tr>';
+        return '<tr><td data-label="Inquiry"><strong>' + escapeHtml(inquiry.title) + '</strong><div class="entity-subtitle">' + escapeHtml(inquiry.description) + '</div></td><td data-label="Resident">' + escapeHtml(resident ? resident.name : "Unassigned") + '</td><td data-label="Assigned">' + escapeHtml(inquiry.assignedTo) + '</td><td data-label="Status"><span class="badge ' + inquiryBadge(inquiry.status) + '">' + escapeHtml(inquiry.status) + '</span></td><td data-label="Priority">' + escapeHtml(inquiry.priority) + '</td><td data-label="Action"><div class="btn-group btn-group-sm"><button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Processing">Processing</button><button class="btn btn-light" type="button" data-action="set-inquiry-status" data-inquiry-id="' + inquiry.id + '" data-status="Closed">Close</button><button class="btn btn-light text-danger" type="button" data-action="delete-inquiry" data-inquiry-id="' + inquiry.id + '">Delete</button></div></td></tr>';
     }
 
     function renderTimelineItem(item) {
@@ -1338,7 +1415,7 @@
         return '<div class="timeline-item">' +
             '<div class="timeline-time">' + formatTime(item.start) + '</div>' +
             '<div><h3>' + escapeHtml(item.title) + '</h3><p>' + escapeHtml(resident.name + " - " + item.location + " - " + item.staff) + '</p></div>' +
-            '<div class="d-flex align-items-center gap-2 flex-wrap justify-content-end"><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span>' +
+            '<div class="timeline-actions d-flex align-items-center gap-2 flex-wrap justify-content-end"><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span>' +
             '<button class="btn btn-sm btn-light" type="button" data-action="edit-schedule" data-schedule-id="' + item.id + '">Edit</button>' +
             (item.status === "Planned" ? '<button class="btn btn-sm btn-light" type="button" data-action="complete-schedule" data-schedule-id="' + item.id + '">Complete</button>' : "") +
             '<button class="btn btn-sm btn-light text-danger" type="button" data-action="cancel-schedule" data-schedule-id="' + item.id + '">Cancel</button>' +
@@ -1358,7 +1435,7 @@
 
     function renderAppointmentTableRow(item) {
         var resident = getResident(item.residentId);
-        return '<tr><td><strong>' + escapeHtml(item.type) + '</strong><div class="entity-subtitle">' + escapeHtml(item.purpose) + '</div></td><td>' + escapeHtml(resident ? resident.name : "Unassigned") + '</td><td>' + escapeHtml(item.family) + '</td><td>' + formatDateTime(item.time) + '</td><td><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span></td><td><div class="btn-group btn-group-sm">' + (item.status === "Pending" ? '<button class="btn btn-light" type="button" data-action="approve-appointment" data-appointment-id="' + item.id + '">Approve</button><button class="btn btn-light" type="button" data-action="reject-appointment" data-appointment-id="' + item.id + '">Reject</button>' : "") + '<button class="btn btn-light text-danger" type="button" data-action="delete-appointment" data-appointment-id="' + item.id + '">Delete</button></div></td></tr>';
+        return '<tr><td data-label="Type"><strong>' + escapeHtml(item.type) + '</strong><div class="entity-subtitle">' + escapeHtml(item.purpose) + '</div></td><td data-label="Resident">' + escapeHtml(resident ? resident.name : "Unassigned") + '</td><td data-label="Family">' + escapeHtml(item.family) + '</td><td data-label="Time">' + formatDateTime(item.time) + '</td><td data-label="Status"><span class="badge ' + scheduleBadge(item.status) + '">' + escapeHtml(item.status) + '</span></td><td data-label="Action"><div class="btn-group btn-group-sm">' + (item.status === "Pending" ? '<button class="btn btn-light" type="button" data-action="approve-appointment" data-appointment-id="' + item.id + '">Approve</button><button class="btn btn-light" type="button" data-action="reject-appointment" data-appointment-id="' + item.id + '">Reject</button>' : "") + '<button class="btn btn-light text-danger" type="button" data-action="delete-appointment" data-appointment-id="' + item.id + '">Delete</button></div></td></tr>';
     }
 
     function renderRecordList(records) {
@@ -1377,7 +1454,7 @@
 
     function renderObservationTableRow(observation) {
         var resident = getResident(observation.residentId);
-        return '<tr><td><strong>' + escapeHtml(resident ? resident.name : "Unassigned") + '</strong><div class="entity-subtitle">' + escapeHtml(observation.nurse) + '</div></td><td>' + escapeHtml(observation.bloodPressure + " BP / " + observation.heartRate + " HR / " + observation.temperature + " C") + '</td><td>' + escapeHtml(observation.medication) + '</td><td>' + formatDateTime(observation.time) + "</td></tr>";
+        return '<tr><td data-label="Resident"><strong>' + escapeHtml(resident ? resident.name : "Unassigned") + '</strong><div class="entity-subtitle">' + escapeHtml(observation.nurse) + '</div></td><td data-label="Vitals">' + escapeHtml(observation.bloodPressure + " BP / " + observation.heartRate + " HR / " + observation.temperature + " C") + '</td><td data-label="Medication">' + escapeHtml(observation.medication) + '</td><td data-label="Time">' + formatDateTime(observation.time) + "</td></tr>";
     }
 
     function renderRelationsTable(resident) {
@@ -1396,12 +1473,13 @@
     }
 
     function renderPermissionSettings(resident) {
+        var permissions = getResidentPermissions(resident);
         return '<div class="soft-panel">' +
             '<div class="section-title"><div><p class="eyebrow mb-1">Visibility for ' + escapeHtml(resident.primaryFamily) + '</p><h2>Family binding permissions</h2></div></div>' +
-            permissionSwitch("View daily care reports", true) +
-            permissionSwitch("Create visit or video appointments", true) +
-            permissionSwitch("View staff-only schedules", false) +
-            permissionSwitch("Download health attachments", false) +
+            permissionSwitch("View daily care reports", "dailyReports", permissions.dailyReports) +
+            permissionSwitch("Create visit or video appointments", "appointments", permissions.appointments) +
+            permissionSwitch("View staff-only schedules", "staffSchedules", permissions.staffSchedules) +
+            permissionSwitch("Download health attachments", "healthAttachments", permissions.healthAttachments) +
             '<p class="muted-copy mb-0 mt-3">In a backend implementation, each toggle maps to resident binding fields and is checked together with RBAC before data is returned.</p>' +
             "</div>";
     }
@@ -1432,12 +1510,8 @@
         return '<div class="stat-tile"><div class="d-flex justify-content-between align-items-center"><span>' + escapeHtml(label) + '</span><i class="fa ' + icon + ' text-primary" aria-hidden="true"></i></div><strong>' + value + '</strong></div>';
     }
 
-    function moduleCard(title, copy, icon, targetView) {
-        return '<div class="app-card"><div class="card-icon"><i class="fa ' + icon + '" aria-hidden="true"></i></div><h3>' + escapeHtml(title) + '</h3><p>' + escapeHtml(copy) + '</p><button class="btn btn-sm btn-light" type="button" data-action="switch-view" data-target-view="' + targetView + '">Open Module</button></div>';
-    }
-
-    function modulePageRow(title, copy, href, icon) {
-        return '<a class="entity-row" href="' + escapeHtml(href) + '"><div class="avatar avatar-small tone-violet"><i class="fa ' + icon + '" aria-hidden="true"></i></div><div class="entity-body"><div class="entity-title">' + escapeHtml(title) + '</div><div class="entity-subtitle">' + escapeHtml(copy) + '</div></div><i class="fa fa-angle-right muted-copy" aria-hidden="true"></i></a>';
+    function moduleCard(title, copy, icon) {
+        return '<div class="app-card"><div class="card-icon"><i class="fa ' + icon + '" aria-hidden="true"></i></div><h3>' + escapeHtml(title) + '</h3><p class="mb-0">' + escapeHtml(copy) + "</p></div>";
     }
 
     function appInfoCard(title, copy, icon) {
@@ -1467,20 +1541,20 @@
     }
 
     function workflowItem(number, title, copy) {
-        return '<div class="timeline-item"><div class="timeline-time">' + escapeHtml(number) + '</div><div><h3>' + escapeHtml(title) + '</h3><p>' + escapeHtml(copy) + '</p></div><span class="badge badge-soft">Step</span></div>';
+        return '<div class="timeline-item"><div class="timeline-time">' + escapeHtml(number) + '</div><div><h3>' + escapeHtml(title) + '</h3><p>' + escapeHtml(copy) + '</p></div><span class="timeline-step-badge badge badge-soft">Step</span></div>';
     }
 
     function elderlyAction(label, icon) {
-        return '<button class="elderly-action" type="button"><i class="fa ' + icon + '" aria-hidden="true"></i><strong>' + escapeHtml(label) + '</strong></button>';
+        return '<button class="elderly-action" type="button" data-action="elderly-action" data-elderly-action="' + escapeHtml(label) + '"><i class="fa ' + icon + '" aria-hidden="true"></i><strong>' + escapeHtml(label) + '</strong></button>';
     }
 
     function relationRow(role, name) {
         return '<tr><td>' + escapeHtml(role) + '</td><td>' + escapeHtml(name) + '</td><td><span class="badge badge-teal">Active</span></td></tr>';
     }
 
-    function permissionSwitch(label, checked) {
-        var id = "perm-" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        return '<div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="' + id + '"' + (checked ? " checked" : "") + '><label class="form-check-label" for="' + id + '">' + escapeHtml(label) + "</label></div>";
+    function permissionSwitch(label, key, checked) {
+        var id = "perm-" + key;
+        return '<div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" id="' + id + '" data-permission="' + escapeHtml(key) + '"' + (checked ? " checked" : "") + '><label class="form-check-label" for="' + id + '">' + escapeHtml(label) + "</label></div>";
     }
 
     function settingsRow(title, copy) {
@@ -1495,6 +1569,32 @@
 
     function emptyState(title, copy) {
         return '<div class="empty-state"><div><i class="fa fa-inbox" aria-hidden="true"></i><h2 class="h5">' + escapeHtml(title) + '</h2><p class="mb-0">' + escapeHtml(copy) + "</p></div></div>";
+    }
+
+    function renderEntityRows(collection, renderer, emptyTitle, emptyCopy) {
+        return collection.length ? collection.map(renderer).join("") : emptyState(emptyTitle, emptyCopy);
+    }
+
+    function renderTableRows(collection, renderer, colspan, emptyTitle, emptyCopy) {
+        if (collection.length) {
+            return collection.map(renderer).join("");
+        }
+        return '<tr><td colspan="' + colspan + '">' + emptyState(emptyTitle, emptyCopy) + "</td></tr>";
+    }
+
+    function defaultResidentPermissions() {
+        return {
+            dailyReports: true,
+            appointments: true,
+            staffSchedules: false,
+            healthAttachments: false
+        };
+    }
+
+    function getResidentPermissions(resident) {
+        var permissions = Object.assign(defaultResidentPermissions(), resident.permissions || {});
+        resident.permissions = permissions;
+        return permissions;
     }
 
     function filteredResidents() {
@@ -1518,6 +1618,9 @@
     function filteredConversations() {
         var q = filters.conversationSearch.trim().toLowerCase();
         return state.conversations.filter(function (conversation) {
+            if (conversation.status === "archived") {
+                return false;
+            }
             var resident = getResident(conversation.residentId);
             var messageText = conversation.messages.map(function (message) {
                 return message.content;
@@ -1678,7 +1781,9 @@
         });
         if (nav) {
             navigateToView(nav.dataset.pageLink);
+            return;
         }
+        toast("No matching resident or page.");
     }
 
     function openResidentModal(resident) {
@@ -1775,7 +1880,8 @@
             nurse: existing ? existing.nurse : "David Lee",
             supervisor: existing ? existing.supervisor : "Grace Turner",
             activityStaff: existing ? existing.activityStaff : "Liu Fang",
-            tone: existing ? existing.tone : "tone-violet"
+            tone: existing ? existing.tone : "tone-violet",
+            permissions: existing ? getResidentPermissions(existing) : defaultResidentPermissions()
         };
         if (existing) {
             Object.assign(existing, payload);
@@ -2226,6 +2332,18 @@
         }
         conversation.status = "archived";
         conversation.unread = 0;
+        var inquiry = state.inquiries.find(function (item) {
+            return item.conversationId === id;
+        });
+        if (inquiry && inquiry.status !== "Closed") {
+            inquiry.status = "Closed";
+        }
+        if (state.activeConversationId === id) {
+            var nextConversation = state.conversations.find(function (item) {
+                return item.status !== "archived";
+            });
+            state.activeConversationId = nextConversation ? nextConversation.id : "";
+        }
         addAudit("Archived conversation", conversation.title);
         saveState();
         render();
@@ -2319,6 +2437,23 @@
         toast("User status updated.");
     }
 
+    function updateResidentPermission(key, checked) {
+        var resident = getResident(state.selectedResidentId);
+        if (!resident) {
+            return;
+        }
+        var permissions = getResidentPermissions(resident);
+        permissions[key] = checked;
+        addAudit("Updated resident permission", resident.name + " - " + key);
+        saveState();
+        toast("Permission setting saved.");
+    }
+
+    function handleElderlyAction(label) {
+        var resident = getResident(state.selectedResidentId);
+        toast((label || "Action") + " is recorded as a demo action for " + (resident ? resident.name : "the resident") + ".");
+    }
+
     function resetDemo() {
         localStorage.removeItem(STORAGE_KEY);
         state = clone(defaultState);
@@ -2390,8 +2525,12 @@
 
     function openInquiries() {
         return state.inquiries.filter(function (item) {
-            return item.status !== "Closed";
+            return isOpenInquiry(item.status);
         });
+    }
+
+    function isOpenInquiry(status) {
+        return status === "Pending" || status === "Processing" || status === "Supervisor Review";
     }
 
     function pendingAppointmentCount() {
@@ -2402,6 +2541,9 @@
 
     function unreadConversationCount() {
         return state.conversations.reduce(function (total, conversation) {
+            if (conversation.status === "archived") {
+                return total;
+            }
             return total + Number(conversation.unread || 0);
         }, 0);
     }

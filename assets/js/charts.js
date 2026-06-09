@@ -201,6 +201,7 @@
         drawDonut(document.getElementById("chartAccountStatus"), payload.accountStatus);
         drawDonut(document.getElementById("chartInquiryStatus"), payload.inquiriesByStatus);
         drawBar(document.getElementById("chartConversationResidents"), payload.conversationsByResident);
+        drawBar(document.getElementById("chartConversationMessages"), payload.messagesByConversation);
         drawDonut(document.getElementById("chartScheduleTypes"), payload.schedulesByType);
         drawDonut(document.getElementById("chartAppointmentStatus"), payload.appointmentsByStatus);
         drawProgress(document.getElementById("chartTaskCompletion"), payload.taskCompletion);
