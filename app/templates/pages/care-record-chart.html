@@ -1,0 +1,96 @@
+{% extends "layouts/base.html" %}
+
+{% block stylesheets %}
+<style>
+    .chart-bars { display: grid; gap: 10px; }
+    .chart-bar-row { display: grid; grid-template-columns: minmax(120px, 180px) 1fr 46px; align-items: center; gap: 10px; }
+    .chart-track { height: 14px; border-radius: 999px; background: #e7efff; overflow: hidden; }
+    .chart-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #3370ff, #15b8a6); }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% set mood_max = mood_rows | map(attribute='value') | max | default(1) %}
+{% set meal_max = meal_rows | map(attribute='value') | max | default(1) %}
+{% set shift_max = shift_rows | map(attribute='value') | max | default(1) %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Chart database function</p>
+            <h2>Care Record Analytics</h2>
+        </div>
+        <form method="get" action="{{ url_for('care_record_chart') }}" class="d-grid gap-2">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">All residents</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}" {% if filters.residentid|string == resident.residentid|string %}selected{% endif %}>{{ resident.fullname }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Start Date
+                <input class="form-control" type="date" name="startdate" value="{{ filters.startdate }}">
+            </label>
+            <label class="form-label">End Date
+                <input class="form-control" type="date" name="enddate" value="{{ filters.enddate }}">
+            </label>
+            <button class="btn btn-primary" type="submit">Apply Filter</button>
+            <a class="btn btn-light" href="{{ url_for('care_records') }}">Back to Records</a>
+        </form>
+    </aside>
+    <main class="detail-pane">
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Live SQL grouped data</p>
+                <h2>Resident Care Trends</h2>
+            </div>
+        </div>
+
+        <div class="module-grid">
+            <article class="app-card">
+                <h3>Mood Distribution</h3>
+                <div class="chart-bars">
+                    {% for row in mood_rows %}
+                    <div class="chart-bar-row">
+                        <strong>{{ row.label }}</strong>
+                        <div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / mood_max * 100) | round(0, 'floor') }}%"></div></div>
+                        <span>{{ row.value }}</span>
+                    </div>
+                    {% else %}
+                    <p>No matching records.</p>
+                    {% endfor %}
+                </div>
+            </article>
+            <article class="app-card">
+                <h3>Meal Status</h3>
+                <div class="chart-bars">
+                    {% for row in meal_rows %}
+                    <div class="chart-bar-row">
+                        <strong>{{ row.label }}</strong>
+                        <div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / meal_max * 100) | round(0, 'floor') }}%"></div></div>
+                        <span>{{ row.value }}</span>
+                    </div>
+                    {% else %}
+                    <p>No matching records.</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+
+        <article class="app-card mt-3">
+            <h3>Records by Shift</h3>
+            <div class="chart-bars">
+                {% for row in shift_rows %}
+                <div class="chart-bar-row">
+                    <strong>{{ row.label }}</strong>
+                    <div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / shift_max * 100) | round(0, 'floor') }}%"></div></div>
+                    <span>{{ row.value }}</span>
+                </div>
+                {% else %}
+                <p>No matching records.</p>
+                {% endfor %}
+            </div>
+        </article>
+    </main>
+</section>
+{% endblock content %}

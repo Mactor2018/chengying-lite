@@ -1,0 +1,117 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Family scheduling</p>
+            <h2>New Appointment Request</h2>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" action="{{ url_for('save_appointment') }}" class="d-grid gap-2">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">Choose resident</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}">{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Family Account
+                <select class="form-select" name="familyid">
+                    <option value="">Choose family member</option>
+                    {% for family in family_accounts %}
+                    <option value="{{ family.accountid }}">{{ family.fullname }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Appointment Type
+                <select class="form-select" name="appointmenttype">
+                    {% for option in appointment_types %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Start
+                <input class="form-control" type="datetime-local" name="starttime">
+            </label>
+            <label class="form-label">End
+                <input class="form-control" type="datetime-local" name="endtime">
+            </label>
+            <label class="form-label">Purpose
+                <textarea class="form-control" name="purpose" rows="3" placeholder="Reason for visit or call"></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Submit Request</button>
+        </form>
+
+        <hr>
+        <form method="get" action="{{ url_for('appointment_requests') }}" class="d-grid gap-2">
+            <p class="eyebrow mb-0">Search requests</p>
+            <select class="form-select" name="status">
+                <option value="">All statuses</option>
+                {% for option in appointment_statuses %}
+                <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-outline-primary" type="submit">Filter Requests</button>
+        </form>
+    </aside>
+
+    <main class="detail-pane">
+        <div class="metric-grid">
+            <div class="stat-tile"><span>Total Requests</span><strong>{{ metrics.total or 0 }}</strong></div>
+            <div class="stat-tile"><span>Pending</span><strong>{{ metrics.pendingcount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Approved</span><strong>{{ metrics.approvedcount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Rejected</span><strong>{{ metrics.rejectedcount or 0 }}</strong></div>
+        </div>
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Review workflow</p>
+                <h2>Family Visit and Video Call Approvals</h2>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Request</th>
+                        <th>Resident</th>
+                        <th>Family</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Review</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td><strong>{{ appointment.appointmenttype }}</strong><br><span class="entity-meta">{{ appointment.purpose }}</span></td>
+                        <td>{{ appointment.residentname }}<br><span class="entity-meta">{{ appointment.roomnumber }}</span></td>
+                        <td>{{ appointment.familyname }}</td>
+                        <td>{{ appointment.starttime }}<br><span class="entity-meta">to {{ appointment.endtime }}</span></td>
+                        <td><span class="badge badge-soft">{{ appointment.appointmentstatus }}</span></td>
+                        <td>
+                            <form method="post" action="{{ url_for('review_appointment', appointment_id=appointment.appointmentid) }}" class="d-flex gap-1">
+                                <select class="form-select form-select-sm" name="appointmentstatus">
+                                    {% for option in appointment_statuses %}
+                                    <option value="{{ option }}" {% if appointment.appointmentstatus == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input class="form-control form-control-sm" name="reviewcomment" placeholder="Comment">
+                                <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6"><div class="empty-state"><div><i class="fa fa-video-camera"></i><p>No appointment requests found.</p></div></div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</section>
+{% endblock content %}

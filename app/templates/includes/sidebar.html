@@ -1,0 +1,40 @@
+<aside class="side-nav" aria-label="Primary navigation">
+    <div class="profile-strip">
+        <div class="workspace-brand">
+            <button class="avatar avatar-station" type="button" aria-label="CareBridge workspace">CB</button>
+            <div class="brand-copy">
+                <strong>CareBridge</strong>
+                <span>MVP Demo</span>
+            </div>
+        </div>
+        {% if can_manage_personnel %}
+        <button class="icon-button" type="button" data-action="new-resident" aria-label="Add resident">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </button>
+        {% endif %}
+    </div>
+
+    <label class="search-pill" for="commandSearch">
+        <i class="fa fa-search" aria-hidden="true"></i>
+        <input id="commandSearch" type="search" placeholder="Search (Cmd+K)" autocomplete="off">
+    </label>
+
+    <nav class="nav flex-column app-nav">
+        {% for section, pages in nav_sections %}
+        <div class="nav-section">
+            <div class="nav-section-title">{{ section }}</div>
+            {% for nav_page in pages %}
+            <a class="nav-link{% if nav_page.key == page.key %} active{% endif %}" href="{{ nav_page.path }}" data-page-link="{{ nav_page.key }}">
+                <i class="fa {{ nav_page.icon }}" aria-hidden="true"></i>
+                <span>{{ nav_page.title }}</span>
+                {% if nav_page.key == "dashboard" %}
+                <span class="nav-badge" id="dashboardBadge"></span>
+                {% elif nav_page.key == "conversations" %}
+                <span class="nav-badge danger" id="conversationBadge"></span>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </nav>
+</aside>

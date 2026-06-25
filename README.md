@@ -1,73 +1,195 @@
-# CareBridge Nursing Home Communication Platform
+# CareBridge Integrated Flask Website
 
-CareBridge is a static Bootstrap demo for a resident-centered nursing home communication and care coordination platform. The interface is designed around the resident profile as the central object, connecting staff, family members, conversations, schedules, care records, and daily reports in one workspace.
+CareBridge is a Flask, Jinja, Bootstrap, and MySQL web application for nursing home communication and care coordination. The project combines resident profiles, role-aware staff access, family communication, schedule coordination, care records, reports, and security support pages into one integrated workspace.
 
-## Demo Scope
+The application is built from the provided Flask project structure and uses Jianning Liu's login and Personnel foundation as the base. Schedule, Communication, and Care Records workflows are integrated into the same visual system and database.
 
-The demo implements the four core modules from the technical design report:
+## Included Website Areas
 
-- **Personnel & Resident Profile Management**: resident profiles, user management, family binding context, staff assignment context, and permission settings.
-- **Conversation & Service Inquiry**: resident-specific conversation spaces, unread indicators, inquiry status actions, and message sending.
-- **Schedule & Appointment Management**: care schedules, activities, visit or video call appointments, request submission, approval, and schedule completion.
-- **Care Records & Daily Status Reports**: daily care record forms, health observation forms, supervisor review, generated daily reports, and simple trend panels.
+- Personnel and Resident Profile Management
+- DeepSeek-backed Personnel Analytics insights
+- Communication and Service Inquiry
+- Schedule and Appointment Management
+- Care Records, Health Observations, and Reports
+- Login, logout, email password recovery, and security governance pages
 
-This is a front-end prototype. It uses in-browser demo data and `localStorage` so that interactions such as adding records, approving appointments, sending messages, and changing inquiry status can be tested without a backend.
+## Login Accounts
 
-## UI Direction
-
-The UI follows a Feishu-inspired workspace style:
-
-- Fixed dark left navigation on desktop with a light operational workspace.
-- Responsive mobile layout that stacks navigation, header, list, and detail areas.
-- Dynamic sidebar badges for dashboard workload and unread conversations.
-- Distinct initials styles for station identity (`CB`), staff identity (`GT`), and resident identity (`EC`, `RW`, `MB`, `SD`).
-- Bootstrap components for modals, forms, tabs, tables, badges, buttons, toasts, and responsive grids.
-
-## How To Run
-
-No build step is required. Open `index.html` directly in a browser:
+All seeded role accounts use password:
 
 ```text
-index.html
+123456
 ```
 
-Because the demo is fully static, all required assets are loaded from local project files under `assets/`.
-
-## Key Files
+Recommended staff account for testing:
 
 ```text
-index.html
-assets/css/carebridge.css
-assets/js/carebridge.js
-assets/bootstrap/
-assets/fonts/
+Username: admin
+Password: 123456
 ```
 
-## Verification
+Other seeded accounts:
 
-The current implementation was checked with:
+```text
+supervisor
+nurse.david
+doctor.nora
+caregiver.mia
+family.olivia
+elder.eleanor
+```
+
+## Main Routes
+
+```text
+/
+/personnel
+/residents
+/users
+/personnel-analytics
+/conversations
+/service-inquiries
+/conversation-detail
+/schedule
+/appointment-requests
+/schedule-analytics
+/care-records
+/care-records/add
+/care-records/chart
+/health-observations
+/reports
+/security
+```
+
+Legacy `.html` URLs such as `/residents.html`, `/schedule.html`, and `/care-records.html` redirect to the matching Flask routes.
+
+## Database Coverage
+
+The application uses the base database tables:
+
+- `account`
+- `resident`
+- `residentaccount`
+- `residentfriendship`
+- `familybinding`
+- `staffassignment`
+- `internalgroup`
+- `groupmembership`
+- `auditlog`
+
+The integrated modules automatically create additional tables on first use:
+
+- Schedule: `scheduleevent`, `appointmentrequest`, `completionlog`
+- Communication: `conversation`, `participant`, `chatmessage`, `serviceinquiry`
+- Care Records: `carerecord`, `carerecordauditlog`
+
+The automatic creation is implemented in:
+
+```text
+app/group_demo_db.py
+```
+
+## How To Run With Local MySQL
+
+Install dependencies:
 
 ```bash
-node --check assets/js/carebridge.js
+python3 -m pip install -r requirements.txt
 ```
 
-Additional browser automation checks covered:
+Initialize the database:
 
-- Rendering all main navigation views.
-- Resident and user search.
-- Adding residents and users.
-- Sending conversation messages.
-- Creating service inquiries.
-- Creating schedules and appointment requests.
-- Approving appointments.
-- Submitting care records and health observations.
-- Generating daily reports.
-- Creating inquiries from reports.
-- Dashboard and conversation badge updates.
-- Desktop and mobile responsive layout behavior.
+```bash
+mysql -u root -p < database/schema.sql
+mysql -u root -p carebridge < database/seed.sql
+```
+
+Configure local secrets by copying `.env.example` to `.env.local` and filling values as needed:
+
+```text
+CAREBRIDGE_DB_HOST=127.0.0.1
+CAREBRIDGE_DB_PORT=3306
+CAREBRIDGE_DB_USER=root
+CAREBRIDGE_DB_PASSWORD=your_mysql_password
+CAREBRIDGE_DB_NAME=carebridge
+
+DEEPSEEK_API_KEY=your_deepseek_api_key
+DEEPSEEK_MODEL=deepseek-v4-flash
+
+CAREBRIDGE_SMTP_HOST=smtp.163.com
+CAREBRIDGE_SMTP_PORT=465
+CAREBRIDGE_SMTP_USER=your_email@example.com
+CAREBRIDGE_SMTP_FROM=your_email@example.com
+CAREBRIDGE_SMTP_PASSWORD=your_smtp_authorization_password
+```
+
+Run the Flask app:
+
+```bash
+python3 run.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5050/
+```
+
+## How To Run With Docker MySQL
+
+If Docker Desktop is running the MySQL service on port `3309`, initialize the database with:
+
+```bash
+docker exec -i carebridge-mysql mysql -uroot -pchange-me < database/schema.sql
+docker exec -i carebridge-mysql mysql -uroot -pchange-me carebridge < database/seed.sql
+```
+
+Then start the Flask app on a separate port:
+
+```bash
+CAREBRIDGE_DB_HOST=127.0.0.1 \
+CAREBRIDGE_DB_PORT=3309 \
+CAREBRIDGE_DB_USER=root \
+CAREBRIDGE_DB_PASSWORD=change-me \
+CAREBRIDGE_DB_NAME=carebridge \
+PORT=5051 \
+python3 run.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5051/
+```
+
+## Functional Highlights
+
+1. Dashboard uses the updated CareBridge animated home page and public login entry.
+2. Personnel pages manage resident, staff, family binding, resident account, friendship, and role-aware graph data.
+3. Personnel Analytics can request DeepSeek insights when `DEEPSEEK_API_KEY` is configured.
+4. Login supports quick demo sign-in, logout, and email verification-code password recovery.
+5. Communication pages track conversations, messages, service inquiries, search, update, and delete workflows.
+6. Schedule pages manage events, appointment requests, completion, cancellation, search, and charts.
+7. Care Records pages support add, modify, soft delete, search, chart, and audit trail functions.
+
+## Verification Completed
+
+The current version was checked with:
+
+```bash
+python3 -m compileall app run.py
+node --check app/static/js/carebridge.js
+node --check app/static/js/charts.js
+```
+
+Route smoke tests passed for all main pages after logging in as `admin`, and database write tests passed for:
+
+- Add care record
+- Add schedule event
+- Send conversation message
+- Create service inquiry
 
 ## Notes
 
-- This prototype intentionally removes the previous landing-page template content and replaces it with the actual usable product workspace.
-- Role switching is not shown in the header because this is a focused demo of the main staff workflow.
-- Demo data is persisted in `localStorage`; clearing browser site data resets the app state.
+- The visual style follows the midterm dashboard direction: dark left navigation, light workspace, compact cards, tables, and operational forms.
+- The project includes the full team page structure while keeping Mingrui Li's Care Records module ready for individual database-function evaluation.

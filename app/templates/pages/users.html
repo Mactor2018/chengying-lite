@@ -1,0 +1,12 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+            <div class="content-grid">
+                <section class="list-pane" id="listPane" aria-live="polite">
+                    <div class="pane-header"><p class="eyebrow mb-1">Account Directory</p><h2>User Filters</h2></div><label class="form-label" for="userSearch">Search accounts</label><div class="toolbar-line"><input class="form-control" id="userSearch" type="search" placeholder="Search user or phone"><button class="btn btn-primary icon-only" type="button" data-action="new-user" aria-label="Add user"><i class="fa fa-plus"></i></button></div><label class="form-label" for="userRoleFilter">Role</label><select class="form-select" id="userRoleFilter"><option>All roles</option></select>
+                </section>
+                <section class="detail-pane" id="detailPane" aria-live="polite">
+                    <div class="section-title"><h2>Account Records</h2><button class="btn btn-primary" type="button" data-action="new-user">Add User</button></div><div class="table-wrap"><table class="table align-middle"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody><tr><td>Loading accounts</td><td>Role</td><td>Status</td><td>Edit / Delete</td></tr></tbody></table></div>
+                </section>
+            </div>
+{% endblock content %}

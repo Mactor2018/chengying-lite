@@ -1,0 +1,12 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+            <div class="content-grid">
+                <section class="list-pane" id="listPane" aria-live="polite">
+                    <div class="pane-header"><p class="eyebrow mb-1">Personnel Analytics</p><h2>Analytics Summary</h2></div><div class="soft-panel mb-3"><strong>Coverage summary</strong><p class="mb-0 muted-copy">Resident profiles, care team staffing, family access, and account status are summarized on this page.</p></div><div class="completion-row"><span>Resident records</span><span class="badge badge-soft">--</span></div><div class="completion-row"><span>Account records</span><span class="badge badge-soft">--</span></div><div class="completion-row"><span>Frozen accounts</span><span class="badge badge-amber">--</span></div>
+                </section>
+                <section class="detail-pane" id="detailPane" aria-live="polite">
+                    <div class="section-title"><h2>Personnel Analytics</h2><span class="badge badge-soft">Loading</span></div><div class="analytics-grid"><div class="chart-card"><h3>Resident care levels</h3><canvas class="chart-canvas" id="chartResidentsByCare" height="220"></canvas></div><div class="chart-card"><h3>Account roles</h3><canvas class="chart-canvas" id="chartUsersByRole" height="220"></canvas></div><div class="chart-card"><h3>Account status</h3><canvas class="chart-canvas" id="chartAccountStatus" height="220"></canvas></div></div>
+                </section>
+            </div>
+{% endblock content %}

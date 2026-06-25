@@ -1,97 +1,3 @@
-<!DOCTYPE html>
-<html data-bs-theme="light" lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>CareBridge Nursing Home Communication Platform</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="assets/css/carebridge.css">
-</head>
-
-<body>
-    <div class="app-shell">
-        <aside class="side-nav" aria-label="Primary navigation">
-            <div class="profile-strip">
-                <div class="workspace-brand">
-                    <button class="avatar avatar-station" type="button" aria-label="CareBridge workspace">CB</button>
-                    <div class="brand-copy">
-                        <strong>CareBridge</strong>
-                        <span>MVP Demo</span>
-                    </div>
-                </div>
-                <button class="icon-button" type="button" data-action="new-resident" aria-label="Add resident">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <label class="search-pill" for="commandSearch">
-                <i class="fa fa-search" aria-hidden="true"></i>
-                <input id="commandSearch" type="search" placeholder="Search (Cmd+K)" autocomplete="off">
-            </label>
-
-            <nav class="nav flex-column app-nav">
-                <button class="nav-link active" type="button" data-view="dashboard">
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    <span>Dashboard</span>
-                    <span class="nav-badge" id="dashboardBadge"></span>
-                </button>
-                <button class="nav-link" type="button" data-view="residents">
-                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
-                    <span>Residents</span>
-                </button>
-                <button class="nav-link" type="button" data-view="conversations">
-                    <i class="fa fa-comments" aria-hidden="true"></i>
-                    <span>Conversations</span>
-                    <span class="nav-badge danger" id="conversationBadge"></span>
-                </button>
-                <button class="nav-link" type="button" data-view="schedule">
-                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                    <span>Schedule</span>
-                </button>
-                <button class="nav-link" type="button" data-view="care">
-                    <i class="fa fa-heartbeat" aria-hidden="true"></i>
-                    <span>Care Records</span>
-                </button>
-                <button class="nav-link" type="button" data-view="reports">
-                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                    <span>Daily Reports</span>
-                </button>
-                <button class="nav-link" type="button" data-view="users">
-                    <i class="fa fa-users" aria-hidden="true"></i>
-                    <span>User Management</span>
-                </button>
-                <button class="nav-link" type="button" data-view="settings">
-                    <i class="fa fa-shield" aria-hidden="true"></i>
-                    <span>Security</span>
-                </button>
-            </nav>
-
-        </aside>
-
-        <main class="main-stage">
-            <header class="topbar">
-                <div>
-                    <p class="eyebrow mb-1" id="viewEyebrow">Resident-centered care platform</p>
-                    <h1 id="viewTitle">Dashboard</h1>
-                </div>
-                <div class="topbar-actions">
-                    <button class="btn btn-light icon-only" type="button" data-action="show-audit" aria-label="Audit log">
-                        <i class="fa fa-bell-o" aria-hidden="true"></i>
-                    </button>
-                    <span class="date-chip">Jun 8, 2026</span>
-                    <div class="avatar avatar-small avatar-staff" aria-label="Signed in staff member">GT</div>
-                </div>
-            </header>
-
-            <div class="content-grid">
-                <section class="list-pane" id="listPane" aria-live="polite"></section>
-                <section class="detail-pane" id="detailPane" aria-live="polite"></section>
-            </div>
-        </main>
-    </div>
-
     <div class="modal fade" id="residentModal" tabindex="-1" aria-labelledby="residentModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <form class="modal-content" id="residentForm">
@@ -144,17 +50,91 @@
                                 <option>Level III Intensive</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="residentFamilyField">Primary family contact</label>
-                            <input class="form-control" id="residentFamilyField" type="text" required>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentAdmissionField">Admission date</label>
+                            <input class="form-control" id="residentAdmissionField" type="date" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="residentCaregiverField">Main caregiver</label>
-                            <input class="form-control" id="residentCaregiverField" type="text" required>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentBirthdateField">Birthday</label>
+                            <input class="form-control" id="residentBirthdateField" type="date">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentHometownField">Hometown</label>
+                            <input class="form-control" id="residentHometownField" type="text" placeholder="Wilmington, DE">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentStatusField">Status</label>
+                            <select class="form-select" id="residentStatusField" required>
+                                <option>Active</option>
+                                <option>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentFamilyAccountField">Primary family account</label>
+                            <select class="form-select" id="residentFamilyAccountField" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentFamilyRelationshipField">Family relationship</label>
+                            <input class="form-control" id="residentFamilyRelationshipField" type="text" placeholder="Daughter" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentEmergencyField">Emergency contact</label>
+                            <input class="form-control" id="residentEmergencyField" type="text" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentCaregiverField">Caregiver</label>
+                            <select class="form-select" id="residentCaregiverField" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentNurseField">Nurse</label>
+                            <select class="form-select" id="residentNurseField" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentDoctorField">Doctors</label>
+                            <select class="form-select" id="residentDoctorField" multiple size="4" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentSupervisorField">Supervisor</label>
+                            <select class="form-select" id="residentSupervisorField" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="residentActivityStaffField">Activity staff</label>
+                            <select class="form-select" id="residentActivityStaffField" required></select>
                         </div>
                         <div class="col-12">
                             <label class="form-label" for="residentTagsField">Health tags</label>
                             <input class="form-control" id="residentTagsField" type="text" placeholder="Hypertension, Mobility Risk">
+                        </div>
+                        <div class="col-12">
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" id="residentPermReportsField" type="checkbox" checked>
+                                        <label class="form-check-label" for="residentPermReportsField">Family can view daily reports</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" id="residentPermAppointmentsField" type="checkbox" checked>
+                                        <label class="form-check-label" for="residentPermAppointmentsField">Family can create appointments</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" id="residentPermSchedulesField" type="checkbox">
+                                        <label class="form-check-label" for="residentPermSchedulesField">Family can view staff schedules</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" id="residentPermHealthField" type="checkbox">
+                                        <label class="form-check-label" for="residentPermHealthField">Family can download health attachments</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-danger d-none mb-0" id="residentFormError" role="alert"></div>
                         </div>
                     </div>
                 </div>
@@ -184,6 +164,10 @@
                             <input class="form-control" id="userNameField" type="text" required>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label" for="userUsernameField">Username</label>
+                            <input class="form-control" id="userUsernameField" type="text" placeholder="nurse.name">
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label" for="userPhoneField">Phone</label>
                             <input class="form-control" id="userPhoneField" type="tel" required>
                         </div>
@@ -194,6 +178,7 @@
                                 <option>Nursing Supervisor</option>
                                 <option>Caregiver</option>
                                 <option>Nurse</option>
+                                <option>Doctor</option>
                                 <option>Activity Staff</option>
                                 <option>Family Member</option>
                                 <option>Elderly Resident</option>
@@ -203,11 +188,156 @@
                             <label class="form-label" for="userDepartmentField">Department</label>
                             <input class="form-control" id="userDepartmentField" type="text" placeholder="Care Team">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="userStatusField">Status</label>
+                            <select class="form-select" id="userStatusField" required>
+                                <option>Active</option>
+                                <option>Frozen</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="userPasswordField">Default password</label>
+                            <input class="form-control" id="userPasswordField" type="text" value="123456">
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-danger d-none mb-0" id="userFormError" role="alert"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
                     <button class="btn btn-primary" type="submit">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignmentModal" tabindex="-1" aria-labelledby="assignmentModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="assignmentForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Staff Assignment</p>
+                        <h2 class="modal-title fs-5" id="assignmentModalTitle">Assign Resident</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="assignmentUserIdField" type="hidden">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="soft-panel mb-0">
+                                <strong id="assignmentUserName">Selected staff</strong>
+                                <p class="mb-0 muted-copy" id="assignmentUserRole">Choose a resident and responsibility.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="assignmentResidentField">Resident</label>
+                            <select class="form-select" id="assignmentResidentField" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="assignmentResponsibilityField">Responsibility</label>
+                            <select class="form-select" id="assignmentResponsibilityField" required></select>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-danger d-none mb-0" id="assignmentFormError" role="alert"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bindingModal" tabindex="-1" aria-labelledby="bindingModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="bindingForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Family Binding</p>
+                        <h2 class="modal-title fs-5" id="bindingModalTitle">Bind Resident</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="bindingUserIdField" type="hidden">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="soft-panel mb-0">
+                                <strong id="bindingUserName">Selected family member</strong>
+                                <p class="mb-0 muted-copy" id="bindingUserRole">Choose a resident and relationship.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="bindingResidentField">Resident</label>
+                            <select class="form-select" id="bindingResidentField" required></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="bindingRelationshipField">Relationship</label>
+                            <input class="form-control" id="bindingRelationshipField" type="text" value="Family" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" id="bindingPrimaryField" type="checkbox">
+                                <label class="form-check-label" for="bindingPrimaryField">Set as primary family contact</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-danger d-none mb-0" id="bindingFormError" role="alert"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save Binding</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="familyAccountModal" tabindex="-1" aria-labelledby="familyAccountModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" id="familyAccountForm">
+                <div class="modal-header">
+                    <div>
+                        <p class="eyebrow mb-1">Resident Portal</p>
+                        <h2 class="modal-title fs-5" id="familyAccountModalTitle">Add Family Account</h2>
+                    </div>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="familyAccountNameField">Name</label>
+                            <input class="form-control" id="familyAccountNameField" type="text" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="familyAccountRelationshipField">Relationship</label>
+                            <input class="form-control" id="familyAccountRelationshipField" type="text" value="Family" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="familyAccountUsernameField">Username</label>
+                            <input class="form-control" id="familyAccountUsernameField" type="text" placeholder="family.name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="familyAccountPhoneField">Phone</label>
+                            <input class="form-control" id="familyAccountPhoneField" type="tel" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="familyAccountPasswordField">Default password</label>
+                            <input class="form-control" id="familyAccountPasswordField" type="text" value="123456">
+                        </div>
+                        <div class="col-12">
+                            <div class="alert alert-danger d-none mb-0" id="familyAccountFormError" role="alert"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Create Family Account</button>
                 </div>
             </form>
         </div>
@@ -224,6 +354,7 @@
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <input id="scheduleIdField" type="hidden">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label" for="scheduleResidentField">Resident</label>
@@ -281,7 +412,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary" type="submit">Create Schedule</button>
+                    <button class="btn btn-primary" id="scheduleSubmitButton" type="submit">Create Schedule</button>
                 </div>
             </form>
         </div>
@@ -370,9 +501,3 @@
             </div>
         </div>
     </div>
-
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/carebridge.js"></script>
-</body>
-
-</html>

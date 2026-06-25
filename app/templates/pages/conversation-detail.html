@@ -1,0 +1,82 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Conversation threads</p>
+            <h2>Open Thread</h2>
+        </div>
+        <div class="entity-list">
+            {% for item in conversation_list %}
+            <a class="entity-row{% if conversation and item.conversationid == conversation.conversationid %} active{% endif %}" href="{{ url_for('conversation_detail', conversationid=item.conversationid) }}">
+                <span class="avatar avatar-small tone-family">{{ item.residentname[:1] }}</span>
+                <div class="entity-body">
+                    <div class="entity-title">{{ item.title }}</div>
+                    <div class="entity-subtitle">{{ item.residentname }}</div>
+                    <div class="entity-meta">{{ item.conversationstatus }}</div>
+                </div>
+            </a>
+            {% else %}
+            <div class="empty-state"><div><i class="fa fa-commenting-o"></i><p>No conversation selected.</p></div></div>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <main class="detail-pane">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+
+        {% if conversation %}
+        <div class="chat-layout">
+            <section class="chat-panel">
+                <div class="chat-header">
+                    <p class="eyebrow">{{ conversation.conversationtype }}</p>
+                    <h2>{{ conversation.title }}</h2>
+                    <p class="mb-0 muted-copy">{{ conversation.residentname }} - {{ conversation.roomnumber }} | {{ conversation.conversationstatus }}</p>
+                </div>
+                <div class="messages">
+                    {% for item in messages %}
+                    <div class="message-row {% if current_account and item.senderid == current_account.accountId %}outgoing{% endif %}">
+                        <div class="bubble">
+                            <strong>{{ item.sendername or "System" }}</strong>
+                            <small class="d-block text-muted">{{ item.senderrole or "CareBridge" }} | {{ item.sentat }}</small>
+                            <p class="mb-0">{{ item.messagetext }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty-state"><div><i class="fa fa-comments-o"></i><p>No messages yet.</p></div></div>
+                    {% endfor %}
+                </div>
+                <form method="post" action="{{ url_for('send_conversation_message', conversation_id=conversation.conversationid) }}" class="message-composer p-3">
+                    <textarea class="form-control" name="messagetext" rows="2" placeholder="Type a response for the care team"></textarea>
+                    <button class="btn btn-primary" type="submit">Send</button>
+                </form>
+            </section>
+            <aside class="quick-profile">
+                <div class="app-card">
+                    <h3>Participants</h3>
+                    {% for participant in participants %}
+                    <div class="entity-row">
+                        <span class="avatar avatar-small tone-staff">{{ participant.fullname[:1] }}</span>
+                        <div class="entity-body">
+                            <div class="entity-title">{{ participant.fullname }}</div>
+                            <div class="entity-subtitle">{{ participant.rolename }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="app-card mt-3">
+                    <h3>Linked Workflow</h3>
+                    <p>This thread can be linked to service inquiries, daily reports, or care record follow-up.</p>
+                    <a class="btn btn-outline-primary" href="{{ url_for('service_inquiries') }}">View Inquiries</a>
+                </div>
+            </aside>
+        </div>
+        {% else %}
+        <div class="empty-state"><div><i class="fa fa-commenting-o"></i><p>No conversation has been created yet.</p></div></div>
+        {% endif %}
+    </main>
+</section>
+{% endblock content %}

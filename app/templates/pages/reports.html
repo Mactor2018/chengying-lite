@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Family-readable summary</p>
+            <h2>Daily Reports</h2>
+        </div>
+        <div class="entity-list">
+            <button class="entity-row active" type="button">
+                <span class="avatar avatar-small tone-resident">EC</span>
+                <div class="entity-body">
+                    <div class="entity-title">Eleanor Carter</div>
+                    <div class="entity-subtitle">Morning report ready</div>
+                    <div class="entity-meta">A-308 | Level II Assisted</div>
+                </div>
+            </button>
+            <button class="entity-row" type="button">
+                <span class="avatar avatar-small tone-teal">RW</span>
+                <div class="entity-body">
+                    <div class="entity-title">Robert Williams</div>
+                    <div class="entity-subtitle">Nutrition follow-up pending</div>
+                    <div class="entity-meta">B-112 | Level I Assisted</div>
+                </div>
+            </button>
+            <button class="entity-row" type="button">
+                <span class="avatar avatar-small tone-violet">HM</span>
+                <div class="entity-body">
+                    <div class="entity-title">Helen Moore</div>
+                    <div class="entity-subtitle">Therapy update included</div>
+                    <div class="entity-meta">B-209 | Level III Intensive</div>
+                </div>
+            </button>
+        </div>
+    </aside>
+    <main class="detail-pane">
+        <div class="profile-heading">
+            <div class="profile-heading-main">
+                <div class="avatar resident-avatar">EC</div>
+                <div>
+                    <p class="eyebrow mb-1">Generated from daily records</p>
+                    <h2>Eleanor Carter Daily Status Report</h2>
+                    <div class="entity-subtitle">Family-facing summary for today's care activities</div>
+                </div>
+            </div>
+            <button class="btn btn-light" type="button">Mark Reviewed</button>
+        </div>
+        <div class="module-grid">
+            <article class="app-card">
+                <h3>Meals and Hydration</h3>
+                <p>Finished most of breakfast and accepted water reminders during the morning shift.</p>
+            </article>
+            <article class="app-card">
+                <h3>Mobility</h3>
+                <p>Completed hallway walking practice with one-person support and no incident.</p>
+            </article>
+            <article class="app-card">
+                <h3>Mood and Activity</h3>
+                <p>Calm mood observed. Joined group activity and responded positively to staff encouragement.</p>
+            </article>
+            <article class="app-card">
+                <h3>Staff Note</h3>
+                <p>Caregiver will continue short mobility sessions and share progress in the next family update.</p>
+            </article>
+        </div>
+    </main>
+</section>
+{% endblock content %}

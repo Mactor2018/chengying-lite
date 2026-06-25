@@ -1,0 +1,14 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="detail-pane mt-2">
+    <div class="empty-state">
+        <div>
+            <i class="fa fa-database" aria-hidden="true"></i>
+            <h2>Database Connection Needed</h2>
+            <p>{{ error }}</p>
+            <p class="mb-0">Load the CareBridge schema and seed data, then refresh this page.</p>
+        </div>
+    </div>
+</section>
+{% endblock content %}

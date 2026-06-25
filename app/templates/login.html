@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>CareBridge - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/carebridge.css') }}">
+    <script>
+        localStorage.removeItem("carebridge-state-v1");
+    </script>
+</head>
+
+<body class="login-page">
+    <main class="login-shell">
+        <section class="login-panel">
+            <div class="avatar avatar-station mb-3">CB</div>
+            <p class="eyebrow mb-1">Personnel Role Demo</p>
+            <h1>Sign in to CareBridge</h1>
+            {% if notice %}
+            <div class="alert alert-success" role="alert">{{ notice }}</div>
+            {% endif %}
+            {% if error %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+            <form method="post" action="{{ url_for('auth.login_submit') }}">
+                <div class="mb-3">
+                    <label class="form-label" for="identifier">Username or phone</label>
+                    <input class="form-control" id="identifier" name="identifier" value="{{ identifier }}" placeholder="admin" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-control" id="password" name="password" type="password" value="123456" required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Sign in</button>
+            </form>
+            <div class="login-helper-row">
+                <a class="btn btn-sm btn-light" href="{{ url_for('auth.forgot_password_form') }}">
+                    <i class="fa fa-key me-1" aria-hidden="true"></i>Forgot password
+                </a>
+            </div>
+            <div class="quick-login-intro mt-4">
+                <strong>Demo quick sign-in</strong>
+                <p class="mb-0 muted-copy">The accounts below are for demonstration.</p>
+            </div>
+            <div class="demo-account-grid mt-3">
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="admin">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Admin</strong><span>admin</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="supervisor">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Supervisor</strong><span>supervisor</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="nurse.david">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Nurse</strong><span>nurse.david</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="doctor.nora">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Doctor</strong><span>doctor.nora</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="caregiver.mia">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Caregiver</strong><span>caregiver.mia</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="family.olivia">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Family</strong><span>family.olivia</span></button>
+                </form>
+                <form method="post" action="{{ url_for('auth.login_submit') }}">
+                    <input name="identifier" type="hidden" value="elder.eleanor">
+                    <input name="password" type="hidden" value="123456">
+                    <button class="quick-login-card" type="submit"><strong>Elderly</strong><span>elder.eleanor</span></button>
+                </form>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

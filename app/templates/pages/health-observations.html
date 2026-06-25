@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Supporting care page</p>
+            <h2>Health Observation Intake</h2>
+        </div>
+        <div class="soft-panel">
+            <label class="form-label">Resident
+                <select class="form-select">
+                    <option>Eleanor Carter - A-308</option>
+                    <option>Robert Williams - B-112</option>
+                    <option>Helen Moore - B-209</option>
+                </select>
+            </label>
+            <label class="form-label mt-2">Observation Type
+                <select class="form-select">
+                    <option>Vital Signs</option>
+                    <option>Medication Note</option>
+                    <option>Fall Risk Check</option>
+                    <option>Clinical Follow-up</option>
+                </select>
+            </label>
+            <label class="form-label mt-2">Clinical Note
+                <textarea class="form-control" rows="4" placeholder="Record nurse observation for handoff."></textarea>
+            </label>
+            <button class="btn btn-primary w-100 mt-3" type="button">Save Observation</button>
+        </div>
+    </aside>
+    <main class="detail-pane">
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Nursing observation workflow</p>
+                <h2>Clinical Signals for Care Records</h2>
+            </div>
+        </div>
+        <div class="module-grid">
+            <article class="app-card">
+                <h3>Vitals Snapshot</h3>
+                <p>Blood pressure, blood sugar, medication notes, and fall-risk observations can be reviewed with daily care records.</p>
+                <div class="tag-cloud">
+                    <span class="badge badge-soft">BP 128/78</span>
+                    <span class="badge badge-teal">Stable</span>
+                    <span class="badge badge-amber">Fall-risk watch</span>
+                </div>
+            </article>
+            <article class="app-card">
+                <h3>Care Team Follow-up</h3>
+                <p>Observation notes give nurses and caregivers a shared handoff context before the next shift begins.</p>
+                <div class="tag-cloud">
+                    <span class="badge badge-violet">Nurse review</span>
+                    <span class="badge badge-soft">Caregiver handoff</span>
+                </div>
+            </article>
+        </div>
+        <div class="app-card mt-3">
+            <h3>Care Records Connection</h3>
+            <p class="mb-0">Observation notes connect clinical signals with structured care records, supervisor review, and family-readable reports.</p>
+        </div>
+    </main>
+</section>
+{% endblock content %}

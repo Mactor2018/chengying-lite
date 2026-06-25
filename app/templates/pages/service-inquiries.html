@@ -1,0 +1,119 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Service inquiry database</p>
+            <h2>New Inquiry</h2>
+        </div>
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+        <form method="post" action="{{ url_for('create_service_inquiry') }}" class="d-grid gap-2">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">Choose resident</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}">{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Title
+                <input class="form-control" name="title" placeholder="Nutrition plan question">
+            </label>
+            <label class="form-label">Priority
+                <select class="form-select" name="priority">
+                    {% for option in priorities %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Assign To
+                <select class="form-select" name="assignedto">
+                    <option value="">Unassigned</option>
+                    {% for staff in staff_accounts %}
+                    <option value="{{ staff.accountid }}">{{ staff.fullname }} - {{ staff.rolename }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Description
+                <textarea class="form-control" name="description" rows="3" placeholder="Describe the family or resident request."></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Create Inquiry</button>
+        </form>
+    </aside>
+
+    <main class="detail-pane">
+        <div class="metric-grid">
+            <div class="stat-tile"><span>Total</span><strong>{{ metrics.total or 0 }}</strong></div>
+            <div class="stat-tile"><span>Open</span><strong>{{ metrics.opencount or 0 }}</strong></div>
+            <div class="stat-tile"><span>In Progress</span><strong>{{ metrics.progresscount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Resolved</span><strong>{{ metrics.resolvedcount or 0 }}</strong></div>
+        </div>
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Add, modify, delete, search</p>
+                <h2>Service Inquiry Tracking</h2>
+            </div>
+            <form method="get" action="{{ url_for('service_inquiries') }}" class="toolbar-line mb-0">
+                <select class="form-select" name="status">
+                    <option value="">All statuses</option>
+                    {% for option in inquiry_statuses %}
+                    <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+                <select class="form-select" name="priority">
+                    <option value="">All priorities</option>
+                    {% for option in priorities %}
+                    <option value="{{ option }}" {% if filters.priority == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+                <input class="form-control" type="search" name="keyword" value="{{ filters.keyword }}" placeholder="Search inquiry">
+                <button class="btn btn-outline-primary" type="submit">Filter</button>
+            </form>
+        </div>
+        <div class="entity-list">
+            {% for inquiry in inquiries %}
+            <article class="entity-row">
+                <span class="avatar avatar-small tone-amber">{{ inquiry.priority[:1] }}</span>
+                <div class="entity-body">
+                    <div class="entity-title">
+                        {{ inquiry.title }}
+                        <span class="badge badge-soft">{{ inquiry.inquirystatus }}</span>
+                        <span class="badge badge-amber">{{ inquiry.priority }}</span>
+                    </div>
+                    <div class="entity-subtitle">{{ inquiry.residentname }} - {{ inquiry.roomnumber }} | Assigned to {{ inquiry.assignedname or "Unassigned" }}</div>
+                    <div class="entity-meta">{{ inquiry.description }}</div>
+                    {% if inquiry.resolutionnote %}
+                    <div class="entity-meta">Resolution: {{ inquiry.resolutionnote }}</div>
+                    {% endif %}
+                </div>
+                <div class="d-grid gap-1">
+                    <form method="post" action="{{ url_for('update_service_inquiry', inquiry_id=inquiry.inquiryid) }}" class="d-flex gap-1">
+                        <select class="form-select form-select-sm" name="inquirystatus">
+                            {% for option in inquiry_statuses %}
+                            <option value="{{ option }}" {% if inquiry.inquirystatus == option %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-select form-select-sm" name="assignedto">
+                            <option value="">Unassigned</option>
+                            {% for staff in staff_accounts %}
+                            <option value="{{ staff.accountid }}" {% if inquiry.assignedto == staff.accountid %}selected{% endif %}>{{ staff.fullname }}</option>
+                            {% endfor %}
+                        </select>
+                        <input class="form-control form-control-sm" name="resolutionnote" placeholder="Note">
+                        <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
+                    </form>
+                    <form method="post" action="{{ url_for('delete_service_inquiry', inquiry_id=inquiry.inquiryid) }}" class="text-end">
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+            {% else %}
+            <div class="empty-state"><div><i class="fa fa-question-circle"></i><p>No service inquiries match this filter.</p></div></div>
+            {% endfor %}
+        </div>
+    </main>
+</section>
+{% endblock content %}

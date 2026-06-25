@@ -1,0 +1,153 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Care records database</p>
+            <h2>Search Records</h2>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+
+        <form method="get" action="{{ url_for('care_records') }}" class="d-grid gap-2">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">All residents</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}" {% if filters.residentid|string == resident.residentid|string %}selected{% endif %}>{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Caregiver
+                <select class="form-select" name="caregiverid">
+                    <option value="">All caregivers</option>
+                    {% for caregiver in caregivers %}
+                    <option value="{{ caregiver.accountid }}" {% if filters.caregiverid|string == caregiver.accountid|string %}selected{% endif %}>{{ caregiver.fullname }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Start Date
+                        <input class="form-control" type="date" name="startdate" value="{{ filters.startdate }}">
+                    </label>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">End Date
+                        <input class="form-control" type="date" name="enddate" value="{{ filters.enddate }}">
+                    </label>
+                </div>
+            </div>
+            <label class="form-label">Shift
+                <select class="form-select" name="shift">
+                    <option value="">All shifts</option>
+                    {% for option in shift_options %}
+                    <option value="{{ option }}" {% if filters.shift == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Mood
+                <select class="form-select" name="moodstatus">
+                    <option value="">All moods</option>
+                    {% for option in mood_options %}
+                    <option value="{{ option }}" {% if filters.moodstatus == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Record Status
+                <select class="form-select" name="recordstatus">
+                    {% for option in ["Active", "Deleted", "All"] %}
+                    <option value="{{ option }}" {% if filters.recordstatus == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Keyword
+                <input class="form-control" type="search" name="keyword" value="{{ filters.keyword }}" placeholder="Search notes, resident, caregiver">
+            </label>
+            <button class="btn btn-primary" type="submit">Apply Search</button>
+            <a class="btn btn-outline-primary" href="{{ url_for('add_care_record') }}">Add Care Record</a>
+            <a class="btn btn-light" href="{{ url_for('care_record_chart') }}">Open Charts</a>
+        </form>
+    </aside>
+
+    <main class="detail-pane">
+        <div class="metric-grid">
+            <div class="stat-tile"><span>Total Records</span><strong>{{ metrics.total or 0 }}</strong></div>
+            <div class="stat-tile"><span>Active</span><strong>{{ metrics.activecount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Today</span><strong>{{ metrics.todaycount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Deleted</span><strong>{{ metrics.deletedcount or 0 }}</strong></div>
+        </div>
+
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Add, modify, delete, search</p>
+                <h2>Structured Daily Care Records</h2>
+            </div>
+            <a class="btn btn-primary" href="{{ url_for('add_care_record') }}">New Record</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Resident</th>
+                        <th>Date / Shift</th>
+                        <th>Caregiver</th>
+                        <th>Condition</th>
+                        <th>Notes</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>#{{ record.recordid }}</td>
+                        <td><strong>{{ record.residentname }}</strong><br><span class="entity-meta">{{ record.roomnumber }}</span></td>
+                        <td>{{ record.caredate }}<br><span class="badge badge-soft">{{ record.shift }}</span></td>
+                        <td>{{ record.caregivername }}<br><span class="entity-meta">{{ record.caregiverrole }}</span></td>
+                        <td>
+                            <span class="badge badge-teal">{{ record.moodstatus }}</span>
+                            <span class="badge badge-violet">{{ record.mobilitystatus }}</span>
+                        </td>
+                        <td>{{ record.carenotes or "No notes entered." }}</td>
+                        <td>
+                            {% if record.recordstatus == "Active" %}
+                            <span class="badge badge-teal">Active</span>
+                            {% else %}
+                            <span class="badge badge-red">Deleted</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                {% if record.recordstatus == "Active" %}
+                                <a class="btn btn-outline-primary" href="{{ url_for('edit_care_record', record_id=record.recordid) }}">Modify</a>
+                                <a class="btn btn-outline-danger" href="{{ url_for('delete_care_record', record_id=record.recordid) }}">Delete</a>
+                                {% else %}
+                                <button class="btn btn-light" type="button" disabled>Read-only</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div>
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                    <p>No care records match the current search.</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</section>
+{% endblock content %}

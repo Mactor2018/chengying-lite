@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+            <div class="content-grid">
+                <section class="list-pane" id="listPane" aria-live="polite">
+                    <div class="pane-header">
+                        <p class="eyebrow mb-1">Personnel Network</p>
+                        <h2>Loading network</h2>
+                    </div>
+                    <div class="soft-panel">
+                        <strong>Preparing relationships</strong>
+                        <p class="mb-0 muted-copy">Care team, family, resident, and department relationships will appear here.</p>
+                    </div>
+                </section>
+                <section class="detail-pane" id="detailPane" aria-live="polite">
+                    <div class="section-title">
+                        <h2>Personnel relationship graph</h2>
+                        <span class="badge badge-soft">Loading</span>
+                    </div>
+                    <div class="soft-panel">
+                        <p class="mb-0 muted-copy">Select a graph tab to review the relationships available to your account.</p>
+                    </div>
+                </section>
+            </div>
+{% endblock content %}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>CareBridge - {{ page.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/carebridge.css') }}">
+    {% block stylesheets %}{% endblock stylesheets %}
+</head>
+
+<body data-page="{{ page.key }}" class="{% if page.key == 'dashboard' %}is-home-page{% endif %}">
+    <div class="app-shell">
+        {% if page.key != "dashboard" %}
+        {% include "includes/sidebar.html" %}
+        {% endif %}
+
+        <main class="main-stage">
+            {% if page.key == "dashboard" %}
+            <header class="home-topbar" aria-label="Homepage navigation">
+                <a class="home-topbar-brand" href="{{ page_url('dashboard') }}" aria-label="CareBridge home">
+                    <span class="home-topbar-mark">CB</span>
+                    <span class="home-topbar-copy">
+                        <strong>CareBridge</strong>
+                        <small>Resident-centered care intelligence</small>
+                    </span>
+                </a>
+                <a class="btn btn-primary home-topbar-login" href="{{ url_for('auth.login_form') }}">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                    <span>Login</span>
+                </a>
+            </header>
+            {% else %}
+            {% include "includes/topbar.html" %}
+            {% endif %}
+
+            {% block content %}{% endblock content %}
+        </main>
+    </div>
+
+    {% include "includes/modals.html" %}
+    {% include "includes/scripts.html" %}
+    {% block javascripts %}{% endblock javascripts %}
+</body>
+
+</html>

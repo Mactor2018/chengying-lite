@@ -1,0 +1,164 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Schedule database</p>
+            <h2>{% if editing_event %}Modify Schedule Event{% else %}Add Schedule Event{% endif %}</h2>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" action="{{ url_for('save_schedule') }}" class="d-grid gap-2">
+            <input type="hidden" name="eventid" value="{{ editing_event.eventid if editing_event else '' }}">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">Choose resident</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}" {% if editing_event and editing_event.residentid == resident.residentid %}selected{% endif %}>{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Staff
+                <select class="form-select" name="staffid">
+                    <option value="">Choose staff</option>
+                    {% for staff in staff_accounts %}
+                    <option value="{{ staff.accountid }}" {% if editing_event and editing_event.staffid == staff.accountid %}selected{% endif %}>{{ staff.fullname }} - {{ staff.rolename }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Event Title
+                <input class="form-control" name="eventtitle" value="{{ editing_event.eventtitle if editing_event else '' }}" placeholder="Morning mobility support">
+            </label>
+            <label class="form-label">Event Type
+                <select class="form-select" name="eventtype">
+                    <option value="">Choose type</option>
+                    {% for option in event_types %}
+                    <option value="{{ option }}" {% if editing_event and editing_event.eventtype == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">Start
+                        <input class="form-control" type="datetime-local" name="starttime" value="{{ editing_event.starttime if editing_event else '' }}">
+                    </label>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">End
+                        <input class="form-control" type="datetime-local" name="endtime" value="{{ editing_event.endtime if editing_event else '' }}">
+                    </label>
+                </div>
+            </div>
+            <label class="form-label">Status
+                <select class="form-select" name="eventstatus">
+                    {% for option in event_statuses %}
+                    <option value="{{ option }}" {% if editing_event and editing_event.eventstatus == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Notes
+                <textarea class="form-control" rows="3" name="notes" placeholder="Operational note for the care team.">{{ editing_event.notes if editing_event else '' }}</textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">{% if editing_event %}Save Changes{% else %}Add Schedule{% endif %}</button>
+            {% if editing_event %}
+            <a class="btn btn-light" href="{{ url_for('schedule_board') }}">Cancel Edit</a>
+            {% endif %}
+        </form>
+
+        <hr>
+
+        <form method="get" action="{{ url_for('schedule_board') }}" class="d-grid gap-2">
+            <p class="eyebrow mb-0">Search schedule</p>
+            <input class="form-control" type="date" name="date" value="{{ filters.date }}">
+            <select class="form-select" name="residentid">
+                <option value="">All residents</option>
+                {% for resident in residents %}
+                <option value="{{ resident.residentid }}" {% if filters.residentid|string == resident.residentid|string %}selected{% endif %}>{{ resident.fullname }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select" name="staffid">
+                <option value="">All staff</option>
+                {% for staff in staff_accounts %}
+                <option value="{{ staff.accountid }}" {% if filters.staffid|string == staff.accountid|string %}selected{% endif %}>{{ staff.fullname }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select" name="eventstatus">
+                <option value="">All statuses</option>
+                {% for option in event_statuses %}
+                <option value="{{ option }}" {% if filters.eventstatus == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-outline-primary" type="submit">Filter Schedule</button>
+        </form>
+    </aside>
+
+    <main class="detail-pane">
+        <div class="metric-grid">
+            <div class="stat-tile"><span>Total Events</span><strong>{{ metrics.total or 0 }}</strong></div>
+            <div class="stat-tile"><span>Scheduled</span><strong>{{ metrics.scheduledcount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Completed</span><strong>{{ metrics.completedcount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Today</span><strong>{{ metrics.todaycount or 0 }}</strong></div>
+        </div>
+
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Add, modify, delete, completion</p>
+                <h2>Care Task and Appointment Schedule Board</h2>
+            </div>
+            <a class="btn btn-light" href="{{ url_for('schedule_analytics') }}">Schedule Analytics</a>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Resident</th>
+                        <th>Event</th>
+                        <th>Staff</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.starttime }}<br><span class="entity-meta">to {{ event.endtime }}</span></td>
+                        <td><strong>{{ event.residentname }}</strong><br><span class="entity-meta">{{ event.roomnumber }}</span></td>
+                        <td><strong>{{ event.eventtitle }}</strong><br><span class="badge badge-soft">{{ event.eventtype }}</span><span class="entity-meta d-block">{{ event.notes }}</span></td>
+                        <td>{{ event.staffname }}<br><span class="entity-meta">{{ event.staffrole }}</span></td>
+                        <td>
+                            {% if event.eventstatus == "Completed" %}
+                            <span class="badge badge-teal">Completed</span>
+                            {% elif event.eventstatus == "Cancelled" %}
+                            <span class="badge badge-red">Cancelled</span>
+                            {% else %}
+                            <span class="badge badge-amber">Scheduled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-outline-primary" href="{{ url_for('edit_schedule_event', event_id=event.eventid) }}">Modify</a>
+                                <form method="post" action="{{ url_for('complete_schedule', event_id=event.eventid) }}">
+                                    <input type="hidden" name="completionnote" value="Completed during care workflow">
+                                    <button class="btn btn-outline-success" type="submit">Complete</button>
+                                </form>
+                                <form method="post" action="{{ url_for('delete_schedule', event_id=event.eventid) }}">
+                                    <button class="btn btn-outline-danger" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6"><div class="empty-state"><div><i class="fa fa-calendar-o"></i><p>No schedule events match this filter.</p></div></div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</section>
+{% endblock content %}

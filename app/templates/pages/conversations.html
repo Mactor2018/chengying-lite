@@ -1,0 +1,116 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="content-grid">
+    <aside class="list-pane">
+        <div class="pane-header">
+            <p class="eyebrow">Communication database</p>
+            <h2>New Conversation</h2>
+        </div>
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-info py-2">{{ message }}</div>
+        {% endfor %}
+
+        <form method="post" action="{{ url_for('create_conversation') }}" class="d-grid gap-2">
+            <label class="form-label">Resident
+                <select class="form-select" name="residentid">
+                    <option value="">Choose resident</option>
+                    {% for resident in residents %}
+                    <option value="{{ resident.residentid }}">{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Conversation Type
+                <select class="form-select" name="conversationtype">
+                    {% for option in conversation_types %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">Title
+                <input class="form-control" name="title" placeholder="Eleanor morning care update">
+            </label>
+            <label class="form-label">Invite Staff
+                <select class="form-select" name="participantid">
+                    <option value="">No additional staff</option>
+                    {% for staff in staff_accounts %}
+                    <option value="{{ staff.accountid }}">{{ staff.fullname }} - {{ staff.rolename }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-label">First Message
+                <textarea class="form-control" name="firstmessage" rows="3" placeholder="Start the care conversation."></textarea>
+            </label>
+            <button class="btn btn-primary" type="submit">Create Conversation</button>
+        </form>
+
+        <hr>
+        <form method="get" action="{{ url_for('conversations') }}" class="d-grid gap-2">
+            <p class="eyebrow mb-0">Search conversations</p>
+            <select class="form-select" name="residentid">
+                <option value="">All residents</option>
+                {% for resident in residents %}
+                <option value="{{ resident.residentid }}" {% if filters.residentid|string == resident.residentid|string %}selected{% endif %}>{{ resident.fullname }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select" name="status">
+                <option value="">All statuses</option>
+                {% for option in conversation_statuses %}
+                <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+            <input class="form-control" type="search" name="keyword" value="{{ filters.keyword }}" placeholder="Search title or resident">
+            <button class="btn btn-outline-primary" type="submit">Filter Conversations</button>
+        </form>
+    </aside>
+
+    <main class="detail-pane">
+        <div class="metric-grid">
+            <div class="stat-tile"><span>Total</span><strong>{{ metrics.total or 0 }}</strong></div>
+            <div class="stat-tile"><span>Open</span><strong>{{ metrics.opencount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Waiting</span><strong>{{ metrics.waitingcount or 0 }}</strong></div>
+            <div class="stat-tile"><span>Closed</span><strong>{{ metrics.closedcount or 0 }}</strong></div>
+        </div>
+
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Search, update, delete</p>
+                <h2>Family and Staff Conversation Inbox</h2>
+            </div>
+            <a class="btn btn-light" href="{{ url_for('service_inquiries') }}">Service Inquiries</a>
+        </div>
+
+        <div class="entity-list">
+            {% for item in conversations %}
+            <article class="entity-row">
+                <span class="avatar avatar-small tone-family">{{ item.residentname[:1] }}</span>
+                <div class="entity-body">
+                    <div class="entity-title">
+                        {{ item.title }}
+                        <span class="badge badge-soft">{{ item.conversationtype }}</span>
+                        {% if item.unreadcount %}
+                        <span class="badge badge-red">{{ item.unreadcount }} unread</span>
+                        {% endif %}
+                    </div>
+                    <div class="entity-subtitle">{{ item.residentname }} - {{ item.roomnumber }} | {{ item.participantcount }} participants | {{ item.messagecount }} messages</div>
+                    <div class="entity-meta">Created by {{ item.creatorname or "System" }} | {{ item.updatedat }}</div>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <a class="btn btn-outline-primary" href="{{ url_for('conversation_detail', conversationid=item.conversationid) }}">Open</a>
+                    <form method="post" action="{{ url_for('update_conversation_status', conversation_id=item.conversationid) }}">
+                        <input type="hidden" name="conversationstatus" value="{% if item.conversationstatus == 'Closed' %}Open{% else %}Closed{% endif %}">
+                        <button class="btn btn-outline-secondary" type="submit">{% if item.conversationstatus == 'Closed' %}Reopen{% else %}Close{% endif %}</button>
+                    </form>
+                    <form method="post" action="{{ url_for('delete_conversation', conversation_id=item.conversationid) }}">
+                        <button class="btn btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+            {% else %}
+            <div class="empty-state"><div><i class="fa fa-comments"></i><p>No conversations match this filter.</p></div></div>
+            {% endfor %}
+        </div>
+    </main>
+</section>
+{% endblock content %}

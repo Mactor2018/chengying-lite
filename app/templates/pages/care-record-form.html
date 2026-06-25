@@ -1,0 +1,133 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="detail-pane mt-2">
+    <div class="section-title">
+        <div>
+            <p class="eyebrow">{{ mode }} database function</p>
+            <h2>{{ mode }} Care Record</h2>
+        </div>
+        <a class="btn btn-light" href="{{ url_for('care_records') }}">Back to Search</a>
+    </div>
+
+    {% for error in errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+
+    <form method="post" action="{{ form_action }}" class="soft-panel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Resident
+                    <select class="form-select" name="residentid">
+                        <option value="">Choose resident</option>
+                        {% for resident in residents %}
+                        <option value="{{ resident.residentid }}" {% if record.residentid|string == resident.residentid|string %}selected{% endif %}>{{ resident.fullname }} - {{ resident.roomnumber }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Caregiver
+                    <select class="form-select" name="caregiverid">
+                        <option value="">Choose caregiver</option>
+                        {% for caregiver in caregivers %}
+                        <option value="{{ caregiver.accountid }}" {% if record.caregiverid|string == caregiver.accountid|string %}selected{% endif %}>{{ caregiver.fullname }} - {{ caregiver.rolename }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Care Date
+                    <input class="form-control" type="date" name="caredate" value="{{ record.caredate }}">
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Shift
+                    <select class="form-select" name="shift">
+                        <option value="">Choose shift</option>
+                        {% for option in shift_options %}
+                        <option value="{{ option }}" {% if record.shift == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Meal Status
+                    <select class="form-select" name="mealstatus">
+                        <option value="">Choose meal status</option>
+                        {% for option in meal_options %}
+                        <option value="{{ option }}" {% if record.mealstatus == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Sleep Status
+                    <select class="form-select" name="sleepstatus">
+                        <option value="">Choose sleep status</option>
+                        {% for option in sleep_options %}
+                        <option value="{{ option }}" {% if record.sleepstatus == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Mood Status
+                    <select class="form-select" name="moodstatus">
+                        <option value="">Choose mood</option>
+                        {% for option in mood_options %}
+                        <option value="{{ option }}" {% if record.moodstatus == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Activity Participation
+                    <select class="form-select" name="activityparticipation">
+                        <option value="">Choose activity status</option>
+                        {% for option in activity_options %}
+                        <option value="{{ option }}" {% if record.activityparticipation == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Hygiene Care
+                    <select class="form-select" name="hygienecare">
+                        <option value="">Choose hygiene status</option>
+                        {% for option in hygiene_options %}
+                        <option value="{{ option }}" {% if record.hygienecare == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Mobility Status
+                    <select class="form-select" name="mobilitystatus">
+                        <option value="">Choose mobility status</option>
+                        {% for option in mobility_options %}
+                        <option value="{{ option }}" {% if record.mobilitystatus == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Care Notes
+                    <textarea class="form-control" name="carenotes" rows="4" placeholder="Add concise care notes for handoff.">{{ record.carenotes }}</textarea>
+                </label>
+            </div>
+            {% if mode == "Modify" %}
+            <div class="col-12">
+                <label class="form-label">Modification Reason
+                    <input class="form-control" type="text" name="modificationreason" value="{{ record.modificationreason }}" placeholder="Required for audit trail">
+                </label>
+            </div>
+            {% endif %}
+        </div>
+        <div class="toolbar-line mt-3 mb-0">
+            <button class="btn btn-primary" type="submit">{{ mode }} Care Record</button>
+            <a class="btn btn-light" href="{{ url_for('care_records') }}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock content %}

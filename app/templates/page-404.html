@@ -1,0 +1,19 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+            <div class="content-grid">
+                <section class="list-pane" aria-live="polite">
+                    <div class="pane-header">
+                        <p class="eyebrow mb-1">Not found</p>
+                        <h2>Page not found</h2>
+                    </div>
+                    <p class="muted-copy mb-0">The requested CareBridge page does not exist.</p>
+                </section>
+                <section class="detail-pane" aria-live="polite">
+                    <div class="section-title">
+                        <h2>Return to Dashboard</h2>
+                    </div>
+                    <a class="btn btn-primary" href="{{ page_url('dashboard') }}">Open Dashboard</a>
+                </section>
+            </div>
+{% endblock content %}

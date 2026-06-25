@@ -1,0 +1,33 @@
+<header class="topbar">
+    <div>
+        <p class="eyebrow mb-1" id="viewEyebrow">{{ page.eyebrow }}</p>
+        <h1 id="viewTitle">{{ page.title }}</h1>
+    </div>
+    <div class="topbar-actions">
+        {% if can_manage_personnel %}
+        <a class="btn btn-light icon-only" href="{{ page_url('settings') }}" aria-label="Audit log">
+            <i class="fa fa-bell-o" aria-hidden="true"></i>
+        </a>
+        {% endif %}
+        <time class="date-chip" id="currentDateTime" aria-live="polite">Loading time</time>
+        {% if current_account %}
+        <div class="dropdown signed-user-menu">
+            <button class="signed-user-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu">
+                <span class="avatar avatar-small avatar-staff {{ role_tone_class(current_account.role) }}" aria-label="Signed in user">{{ current_account.name[:1] }}{{ current_account.name.split(' ')[-1][:1] }}</span>
+                <span><strong>{{ current_account.name }}</strong><small>{{ current_account.role }}</small></span>
+                <i class="fa fa-angle-down signed-user-caret" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end signed-user-dropdown">
+                <li>
+                    <a class="dropdown-item signed-user-exit" href="{{ url_for('auth.logout') }}">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        <span>Exit</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% else %}
+        <a class="btn btn-light" href="{{ url_for('auth.login_form') }}">Login</a>
+        {% endif %}
+    </div>
+</header>

@@ -1,0 +1,12 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+            <div class="content-grid">
+                <section class="list-pane" id="listPane" aria-live="polite">
+                    <div class="pane-header"><p class="eyebrow mb-1">Resident Directory</p><h2>Resident Profiles</h2></div><label class="form-label" for="residentSearch">Search records</label><div class="toolbar-line"><input class="form-control" id="residentSearch" type="search" placeholder="Search name, room, tag"><button class="btn btn-primary icon-only" type="button" data-action="new-resident" aria-label="Add resident"><i class="fa fa-plus"></i></button></div><label class="form-label" for="residentCareFilter">Care level</label><select class="form-select mb-3" id="residentCareFilter"><option>All care levels</option></select><div class="entity-list"><div class="entity-row"><div class="entity-body"><div class="entity-title">Resident records</div><div class="entity-subtitle">Loading resident profiles</div></div></div></div>
+                </section>
+                <section class="detail-pane" id="detailPane" aria-live="polite">
+                    <div class="profile-heading"><div class="profile-heading-main"><div class="avatar resident-avatar">EC</div><div><p class="eyebrow mb-1">Resident Profile</p><h2>Resident details</h2><div class="entity-subtitle">Relations, permissions, schedules, care records</div></div></div><button class="btn btn-light" type="button" data-action="edit-resident">Edit</button></div><div class="metric-grid static-skeleton"><div class="stat-tile"><span>Today care</span><strong>--</strong><span>Resident-specific daily record</span></div><div class="stat-tile"><span>Open inquiries</span><strong>--</strong><span>Resident-specific workflow</span></div></div><div class="analytics-grid mb-3"><div class="chart-card"><h3>Care outcome signals</h3><canvas class="chart-canvas" id="chartResidentCareSignals" height="220"></canvas></div><div class="chart-card"><h3>Schedule mix</h3><canvas class="chart-canvas" id="chartResidentScheduleTypes" height="220"></canvas></div></div>
+                </section>
+            </div>
+{% endblock content %}

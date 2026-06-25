@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+
+{% block stylesheets %}
+<style>
+    .chart-bars { display: grid; gap: 10px; }
+    .chart-bar-row { display: grid; grid-template-columns: minmax(140px, 200px) 1fr 46px; align-items: center; gap: 10px; }
+    .chart-track { height: 14px; border-radius: 999px; background: #e7efff; overflow: hidden; }
+    .chart-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #3370ff, #15b8a6); }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% set type_max = event_type_rows | map(attribute='value') | max | default(1) %}
+{% set status_max = status_rows | map(attribute='value') | max | default(1) %}
+{% set appointment_max = appointment_rows | map(attribute='value') | max | default(1) %}
+{% set daily_max = daily_rows | map(attribute='value') | max | default(1) %}
+<section class="detail-pane mt-2">
+    <div class="section-title">
+        <div>
+            <p class="eyebrow">Schedule visual analytics</p>
+            <h2>Care Operations Load and Appointment Flow</h2>
+        </div>
+        <a class="btn btn-light" href="{{ url_for('schedule_board') }}">Back to Schedule</a>
+    </div>
+
+    <div class="module-grid">
+        <article class="app-card">
+            <h3>Events by Type</h3>
+            <div class="chart-bars">
+                {% for row in event_type_rows %}
+                <div class="chart-bar-row"><strong>{{ row.label }}</strong><div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / type_max * 100) | round(0, 'floor') }}%"></div></div><span>{{ row.value }}</span></div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="app-card">
+            <h3>Events by Status</h3>
+            <div class="chart-bars">
+                {% for row in status_rows %}
+                <div class="chart-bar-row"><strong>{{ row.label }}</strong><div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / status_max * 100) | round(0, 'floor') }}%"></div></div><span>{{ row.value }}</span></div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="app-card">
+            <h3>Appointment Review Status</h3>
+            <div class="chart-bars">
+                {% for row in appointment_rows %}
+                <div class="chart-bar-row"><strong>{{ row.label }}</strong><div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / appointment_max * 100) | round(0, 'floor') }}%"></div></div><span>{{ row.value }}</span></div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="app-card">
+            <h3>Daily Schedule Volume</h3>
+            <div class="chart-bars">
+                {% for row in daily_rows %}
+                <div class="chart-bar-row"><strong>{{ row.label }}</strong><div class="chart-track"><div class="chart-fill" style="width: {{ (row.value / daily_max * 100) | round(0, 'floor') }}%"></div></div><span>{{ row.value }}</span></div>
+                {% endfor %}
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock content %}
